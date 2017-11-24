@@ -1,0 +1,52 @@
+{
+  "name": "partial-application.macro",
+  "version": "1.0.0",
+  "description": "Partial application syntax and implicit parameters for JavaScript, inspired by Scala's `_` & Kotlin's `it`",
+  "author": {
+    "name": "Bo Lingen",
+    "email": "lingenbw@gmail.com",
+    "url": "github.com/citycide"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/citycide/partial-application.macro.git"
+  },
+  "homepage": "https://github.com/citycide/partial-application.macro",
+  "bugs": "https://github.com/citycide/partial-application.macro/issues",
+  "main": "./dist/index.js",
+  "engines": {
+    "node": ">=6"
+  },
+  "keywords": [
+    "babel-macro",
+    "functional",
+    "partial",
+    "application",
+    "currying",
+    "curried",
+    "scala",
+    "kotlin",
+    "template",
+    "placeholder"
+  ],
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "babel src -d dist",
+    "test": "npm run build && ava",
+    "prepublishOnly": "npm test"
+  },
+  "dependencies": {
+    "babel-macros": "^1.2.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.0.0-beta.32",
+    "@babel/core": "^7.0.0-beta.32",
+    "@babel/preset-env": "^7.0.0-beta.32",
+    "@babel/preset-stage-1": "^7.0.0-beta.32",
+    "ava": "^0.23.0",
+    "dedent": "^0.7.0"
+  }
+}
