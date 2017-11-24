@@ -9,11 +9,11 @@ var _util = require("./util");
 
 function transformImplicitParams(t, refs) {
   refs.forEach(referencePath => {
-    var _findTargetCallee;
+    var _findTargetCallee, _referencePath$findPa;
 
-    const parent = (_findTargetCallee = (0, _util.findTargetCallee)(referencePath)) !== null && _findTargetCallee !== void 0 ? _findTargetCallee : referencePath.findParent(_it => {
+    const parent = (_findTargetCallee = (0, _util.findTargetCallee)(referencePath)) !== null && _findTargetCallee !== void 0 ? _findTargetCallee : (_referencePath$findPa = referencePath.findParent(_it => {
       return _it.isVariableDeclarator();
-    }).get('init');
+    })) === null || _referencePath$findPa === void 0 ? void 0 : _referencePath$findPa.get('init');
 
     if (!parent) {
       throw new _babelMacros.MacroError('Implicit parameters must be used as function arguments or the\n' + 'right side of a variable declaration, ie. `const identity = it`)');

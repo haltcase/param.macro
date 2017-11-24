@@ -6,7 +6,7 @@ export default function transformImplicitParams (t, refs) {
   refs.forEach(referencePath => {
     const parent =
       findTargetCallee(referencePath) ??
-      referencePath.findParent(it.isVariableDeclarator()).get('init')
+      referencePath.findParent(it.isVariableDeclarator())?.get('init')
 
     if (!parent) {
       throw new MacroError(
