@@ -1,6 +1,6 @@
 {
   "name": "partial-application.macro",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Partial application syntax and implicit parameters for JavaScript, inspired by Scala's `_` & Kotlin's `it`",
   "author": {
     "name": "Bo Lingen",
