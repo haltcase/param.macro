@@ -9,26 +9,23 @@ var _util = require("./util");
 
 function transformImplicitParams(t, refs) {
   refs.forEach(referencePath => {
-    if (referencePath.parentPath.isVariableDeclarator()) {
-      const id = referencePath.scope.generateUidIdentifier('it');
-      const identity = t.arrowFunctionExpression([id], id);
-      referencePath.replaceWith(identity);
-      return;
-    }
+    var _findTargetCallee;
 
-    const parent = (0, _util.findTargetCallee)(referencePath);
+    const parent = (_findTargetCallee = (0, _util.findTargetCallee)(referencePath)) !== null && _findTargetCallee !== void 0 ? _findTargetCallee : referencePath.findParent(_it => {
+      return _it.isVariableDeclarator();
+    }).get('init');
 
     if (!parent) {
       throw new _babelMacros.MacroError('Implicit parameters must be used as function arguments or the\n' + 'right side of a variable declaration, ie. `const identity = it`)');
     }
 
     if (parent.getData('it.wasTransformed')) {
-      referencePath.scope.rename(referencePath.node.name, parent.getData('it.idName'));
+      parent.scope.rename(referencePath.node.name, parent.getData('it.idName'));
       return;
     }
 
-    const id = referencePath.scope.generateUidIdentifier('it');
-    referencePath.scope.rename(referencePath.node.name, id.name);
+    const id = parent.scope.generateUidIdentifier('it');
+    parent.scope.rename(referencePath.node.name, id.name);
     const fn = t.arrowFunctionExpression([id], t.blockStatement([t.returnStatement(parent.node)]));
 
     const _parent$replaceWith = parent.replaceWith(fn),

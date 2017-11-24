@@ -36,7 +36,9 @@ test(
     const identity = it
   `,
   $`
-    const identity = _it => _it;
+    const identity = _it => {
+      return _it;
+    };
   `
 )
 
@@ -122,7 +124,9 @@ test(
     const identity = it
   `,
   $`
-    const identity = _it => _it;
+    const identity = _it => {
+      return _it;
+    };
   `
 )
 
