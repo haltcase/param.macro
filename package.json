@@ -19,7 +19,8 @@
     "node": ">=6"
   },
   "keywords": [
-    "babel-macro",
+    "babel-macros",
+    "macro",
     "functional",
     "partial",
     "application",
