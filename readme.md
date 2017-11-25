@@ -235,7 +235,7 @@ There are a couple of major difference between the two:
 
 ### scoping
 
-`_` will always traverse upward out of the nearest function call, while `_` will be
+`_` will always traverse upward out of the nearest function call, while `it` will be
 transformed in place. It's easiest to see when we look at a simple example:
 
 ```js
