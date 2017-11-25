@@ -2,7 +2,7 @@ import test from 'ava'
 
 import { transformSync } from '@babel/core'
 import macros from 'babel-macros'
-import dedent from 'dedent'
+import $ from 'dedent'
 
 function testMacro (t, input, expected) {
   const output = transformSync(input, {
@@ -11,7 +11,7 @@ function testMacro (t, input, expected) {
     filename: __filename,
   }).code.trim()
 
-  t.is(dedent(output), dedent(expected))
+  t.is(output, expected)
 }
 
 test(
@@ -31,11 +31,11 @@ test(
 test(
   'it: default import is the same as `it` named import',
   testMacro,
-  `
+  $`
     import it from 'partial-application.macro'
     const identity = it
   `,
-  `
+  $`
     const identity = _it => {
       return _it;
     };
@@ -45,11 +45,11 @@ test(
 test(
   'it: aliased named import works',
   testMacro,
-  `
+  $`
     import { it as IT } from 'partial-application.macro'
     array.map(IT + ' sheckles')
   `,
-  `
+  $`
     array.map(_it => {
       return _it + ' sheckles';
     });
@@ -59,11 +59,11 @@ test(
 test(
   '_: aliased named import works',
   testMacro,
-  `
+  $`
     import { _ as PLACEHOLDER } from 'partial-application.macro'
     const toInt = parseInt(PLACEHOLDER, 10)
   `,
-  `
+  $`
     const toInt = (_arg) => {
       return parseInt(_arg, 10);
     };
@@ -73,11 +73,11 @@ test(
 test(
   'it: transforms `it` arguments to lambda parameters',
   testMacro,
-  `
+  $`
     import { it } from 'partial-application.macro'
     const arr = [1, 2, 3].map(it * 2)
   `,
-  `
+  $`
     const arr = [1, 2, 3].map(_it => {
       return _it * 2;
     });
@@ -87,12 +87,12 @@ test(
 test(
   'it: supports nested properties and methods',
   testMacro,
-  `
+  $`
     import { it } from 'partial-application.macro'
     const arr1 = array.map(it.foo.bar)
     const arr2 = array.map(it.foo.baz())
   `,
-  `
+  $`
     const arr1 = array.map(_it => {
       return _it.foo.bar;
     });
@@ -105,11 +105,11 @@ test(
 test(
   'it: lone `it` results in the identity function',
   testMacro,
-  `
+  $`
     import { it } from 'partial-application.macro'
     const arr = [1, 2, 3].map(it)
   `,
-  `
+  $`
     const arr = [1, 2, 3].map(_it => {
       return _it;
     });
@@ -119,11 +119,11 @@ test(
 test(
   'it: assignment is the identity function',
   testMacro,
-  `
+  $`
     import { it } from 'partial-application.macro'
     const identity = it
   `,
-  `
+  $`
     const identity = _it => {
       return _it;
     };
@@ -133,11 +133,11 @@ test(
 test(
   'it: multiple uses always refer to the first parameter',
   testMacro,
-  `
+  $`
     import { it } from 'partial-application.macro'
     fn(it + it + it * it)
   `,
-  `
+  $`
     fn(_it => {
       return _it + _it + _it * _it;
     });
@@ -147,11 +147,11 @@ test(
 test(
   '_: partially applies the called function',
   testMacro,
-  `
+  $`
     import { _ } from 'partial-application.macro'
     const log = console.log(_)
   `,
-  `
+  $`
     const log = (_arg) => {
       return console.log(_arg);
     };
@@ -161,11 +161,11 @@ test(
 test(
   '_: works with multiple placeholders',
   testMacro,
-  `
+  $`
     import { _ } from 'partial-application.macro'
     const log = console.log(_, 1, _, 2, _)
   `,
-  `
+  $`
     const log = (_arg, _arg2, _arg3) => {
       return console.log(_arg, 1, _arg2, 2, _arg3);
     };
@@ -175,11 +175,11 @@ test(
 test(
   '_: hoists complex sibling arguments to prevent multiple executions',
   testMacro,
-  `
+  $`
     import { _ } from 'partial-application.macro'
     const log = console.log(_, {}, foo(), new Person(), 2, _.bar())
   `,
-  `
+  $`
     var _ref = foo(),
         _ref2 = new Person();
 
@@ -192,11 +192,11 @@ test(
 test(
   '_: does not hoist nested partial functions',
   testMacro,
-  `
+  $`
     import { _ } from 'partial-application.macro'
     const mapper = map(_, get(_, 'nested.key', 'default'))
   `,
-  `
+  $`
     const mapper = (_arg) => {
       return map(_arg, (_arg2) => {
         return get(_arg2, 'nested.key', 'default');
@@ -208,12 +208,12 @@ test(
 test(
   '_: supports nested properties and methods',
   testMacro,
-  `
+  $`
     import { _ } from 'partial-application.macro'
     console.log(_.foo.bar)
     console.log(_.foo.baz())
   `,
-  `
+  $`
     (_arg) => {
       return console.log(_arg.foo.bar);
     };
