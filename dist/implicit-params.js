@@ -3,8 +3,6 @@
 exports.__esModule = true;
 exports.default = transformImplicitParams;
 
-var _babelMacros = require("babel-macros");
-
 var _util = require("./util");
 
 function transformImplicitParams(t, refs) {
@@ -16,7 +14,7 @@ function transformImplicitParams(t, refs) {
     })) === null || _referencePath$findPa === void 0 ? void 0 : _referencePath$findPa.get('init');
 
     if (!parent) {
-      throw new _babelMacros.MacroError('Implicit parameters must be used as function arguments or the\n' + 'right side of a variable declaration, ie. `const identity = it`)');
+      throw new _util.PartialError('Implicit parameters must be used as function arguments or the\n' + 'right side of a variable declaration, ie. `const identity = it`)');
     }
 
     if (parent.getData('it.wasTransformed')) {

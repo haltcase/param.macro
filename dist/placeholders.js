@@ -3,8 +3,6 @@
 exports.__esModule = true;
 exports.default = transformPlaceholders;
 
-var _babelMacros = require("babel-macros");
-
 var _util = require("./util");
 
 function transformPlaceholders(t, refs) {
@@ -33,7 +31,7 @@ function transformPlaceholders(t, refs) {
       });
 
       if (!decl) {
-        throw new _babelMacros.MacroError('Placeholders must be used as function arguments or the\n' + 'right side of a variable declaration, ie. `const eq = _ === _`)');
+        throw new _util.PartialError('Placeholders must be used as function arguments or the\n' + 'right side of a variable declaration, ie. `const eq = _ === _`)');
       }
 
       isAssign = true;
