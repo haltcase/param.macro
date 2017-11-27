@@ -2,6 +2,8 @@
 
 > Partial application syntax and implicit parameters for JavaScript, inspired by Scala's `_` & Kotlin's `it`.
 
+> **try it live** on the **[online playground](https://citycide.github.io/partial-application.macro)**
+
 - [overview](#overview)
 - [installation](#installation)
   - [set custom tokens](#set-custom-tokens)
