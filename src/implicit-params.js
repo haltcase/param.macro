@@ -1,6 +1,5 @@
 import it from 'partial-application.macro'
-import { MacroError } from 'babel-macros'
-import { findTargetCallee } from './util'
+import { findTargetCallee, PartialError } from './util'
 
 export default function transformImplicitParams (t, refs) {
   refs.forEach(referencePath => {
@@ -9,7 +8,7 @@ export default function transformImplicitParams (t, refs) {
       referencePath.findParent(it.isVariableDeclarator())?.get('init')
 
     if (!parent) {
-      throw new MacroError(
+      throw new PartialError(
         'Implicit parameters must be used as function arguments or the\n' +
         'right side of a variable declaration, ie. `const identity = it`)'
       )

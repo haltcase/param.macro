@@ -1,7 +1,7 @@
 import { _, it } from 'partial-application.macro'
-import { MacroError } from 'babel-macros'
 
 import {
+  PartialError,
   findTargetCallee,
   findTargetCaller,
   findWrapper,
@@ -28,7 +28,7 @@ export default function transformPlaceholders (t, refs) {
     if (!caller) {
       const decl = referencePath.findParent(it.isVariableDeclarator())
       if (!decl) {
-        throw new MacroError(
+        throw new PartialError(
           'Placeholders must be used as function arguments or the\n' +
           'right side of a variable declaration, ie. `const eq = _ === _`)'
         )
