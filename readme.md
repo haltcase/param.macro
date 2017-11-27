@@ -15,6 +15,7 @@
 - [usage](#usage)
   - [Babel v7](#babelrcjs-babel-v7)
   - [Babel v6](#babelrc-babel-v6)
+  - [standalone plugin](#standalone-plugin)
 - [differences between `_` and `it`](#differences-between-_-and-it)
 - [caveats & limitations](#caveats--limitations)
 - [comparison to libraries](#comparison-to-libraries)
@@ -62,6 +63,8 @@ module.exports = {
   plugins: ['module:babel-macros']
 }
 ```
+
+> for usage without `babel-macros`, see [_standalone plugin_](#standalone-plugin)
 
 Then just `import` and use:
 
@@ -225,6 +228,29 @@ module.exports = {
   "plugins": ["babel-macros"]
 }
 ```
+
+### standalone plugin
+
+A standalone version is also provided for those not already using
+`babel-macros`:
+
+* .babelrc.js (Babel v7)
+
+  ```js
+  module.exports = {
+    presets: [],
+    plugins: ['module:partial-application.macro/plugin']
+  }
+  ```
+
+* .babelrc (Babel v6)
+
+  ```json
+  {
+    "presets": [],
+    "plugins": ["partial-application.macro/plugin"]
+  }
+  ```
 
 ## differences between `_` and `it`
 
