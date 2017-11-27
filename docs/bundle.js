@@ -348,10 +348,10 @@ function findTargetCaller(path) {
   return (_findTargetCallee = findTargetCallee(path)) === null || _findTargetCallee === void 0 ? void 0 : _findTargetCallee.parentPath;
 }
 
-function findWrapper(path) {
-  var callee = findTargetCallee(path);
+function findWrapper(path, noCallee) {
+  var root = noCallee ? path : findTargetCallee(path);
   var calls = 0;
-  var link = callee;
+  var link = root;
 
   while (link = (_link = link) === null || _link === void 0 ? void 0 : _link.parentPath) {
     var _link;
@@ -101732,7 +101732,7 @@ var _util = __webpack_require__(2);
 
 function transformPlaceholders(t, refs) {
   var hoistTargets = [];
-  refs.forEach(function (referencePath) {
+  refs.forEach(function (referencePath, i) {
     var wrapper = (0, _util.findWrapper)(referencePath);
 
     if (wrapper) {
@@ -101751,16 +101751,16 @@ function transformPlaceholders(t, refs) {
     var isAssign = false;
 
     if (!caller) {
-      var decl = referencePath.findParent(function (_it) {
+      var _referencePath$findPa;
+
+      var decl = (_referencePath$findPa = referencePath.findParent(function (_it) {
         return _it.isVariableDeclarator();
-      });
-
-      if (!decl) {
-        throw new _util.PartialError('Placeholders must be used as function arguments or the\n' + 'right side of a variable declaration, ie. `const eq = _ === _`)');
-      }
-
+      })) !== null && _referencePath$findPa !== void 0 ? _referencePath$findPa : function (e) {
+        throw e;
+      }(new _util.PartialError('Placeholders must be used as function arguments or the\n' + 'right side of a variable declaration, ie. `const eq = _ === _`)'));
       isAssign = true;
       caller = decl.get('init');
+      wrapper = (0, _util.findWrapper)(referencePath, true);
     }
 
     var id = caller.scope.generateUidIdentifier('arg');
@@ -101769,6 +101769,11 @@ function transformPlaceholders(t, refs) {
         replacement = _referencePath$replac2[0];
 
     replacement.setData('_.wasPlaceholder', true);
+
+    if (wrapper) {
+      wrapper.node.params.push(id);
+      return;
+    }
 
     if (!isAssign) {
       var replacementCallee = (0, _util.findTargetCallee)(replacement);
