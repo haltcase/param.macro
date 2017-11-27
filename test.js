@@ -173,6 +173,25 @@ test(
 )
 
 test(
+  '_: assigned expressions compile to a single function',
+  testMacro,
+  $`
+    import { _ } from 'partial-application.macro'
+    const areSameThing = _ === _
+    const oneMansIsAnothers = _.trash === _.treasure
+  `,
+  $`
+    const areSameThing = (_arg, _arg2) => {
+      return _arg === _arg2;
+    };
+
+    const oneMansIsAnothers = (_arg3, _arg4) => {
+      return _arg3.trash === _arg4.treasure;
+    };
+  `
+)
+
+test(
   '_: hoists complex sibling arguments to prevent multiple executions',
   testMacro,
   $`

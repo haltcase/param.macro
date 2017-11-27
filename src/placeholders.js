@@ -12,7 +12,7 @@ export default function transformPlaceholders (t, refs) {
   const hoistTargets = []
 
   refs.forEach(referencePath => {
-    const wrapper = findWrapper(referencePath)
+    let wrapper = findWrapper(referencePath)
 
     if (wrapper) {
       const id = wrapper.scope.generateUidIdentifier('arg')
@@ -26,21 +26,26 @@ export default function transformPlaceholders (t, refs) {
     let caller = findTargetCaller(referencePath)
     let isAssign = false
     if (!caller) {
-      const decl = referencePath.findParent(it.isVariableDeclarator())
-      if (!decl) {
+      const decl =
+        referencePath.findParent(it.isVariableDeclarator()) ??
         throw new PartialError(
           'Placeholders must be used as function arguments or the\n' +
           'right side of a variable declaration, ie. `const eq = _ === _`)'
         )
-      }
 
       isAssign = true
       caller = decl.get('init')
+      wrapper = findWrapper(referencePath, true)
     }
 
     const id = caller.scope.generateUidIdentifier('arg')
     const [replacement] = referencePath.replaceWith(id)
     replacement.setData('_.wasPlaceholder', true)
+
+    if (wrapper) {
+      wrapper.node.params.push(id)
+      return
+    }
 
     if (!isAssign) {
       const replacementCallee = findTargetCallee(replacement)
@@ -48,7 +53,6 @@ export default function transformPlaceholders (t, refs) {
 
       hoistTargets.push(caller)
     }
-
 
     const fn = t.arrowFunctionExpression(
       [id],

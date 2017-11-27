@@ -33,11 +33,11 @@ export function findTargetCaller (path) {
   return findTargetCallee(path)?.parentPath
 }
 
-export function findWrapper (path) {
-  const callee = findTargetCallee(path)
+export function findWrapper (path, noCallee) {
+  const root = noCallee ? path : findTargetCallee(path)
 
   let calls = 0
-  let link = callee
+  let link = root
   while ((link = link?.parentPath)) {
     if (link.isCallExpression()) calls++
     if (calls > 1) break

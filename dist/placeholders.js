@@ -8,7 +8,7 @@ var _util = require("./util");
 function transformPlaceholders(t, refs) {
   const hoistTargets = [];
   refs.forEach(referencePath => {
-    const wrapper = (0, _util.findWrapper)(referencePath);
+    let wrapper = (0, _util.findWrapper)(referencePath);
 
     if (wrapper) {
       const id = wrapper.scope.generateUidIdentifier('arg');
@@ -26,16 +26,16 @@ function transformPlaceholders(t, refs) {
     let isAssign = false;
 
     if (!caller) {
-      const decl = referencePath.findParent(_it => {
+      var _referencePath$findPa;
+
+      const decl = (_referencePath$findPa = referencePath.findParent(_it => {
         return _it.isVariableDeclarator();
-      });
-
-      if (!decl) {
-        throw new _util.PartialError('Placeholders must be used as function arguments or the\n' + 'right side of a variable declaration, ie. `const eq = _ === _`)');
-      }
-
+      })) !== null && _referencePath$findPa !== void 0 ? _referencePath$findPa : function (e) {
+        throw e;
+      }(new _util.PartialError('Placeholders must be used as function arguments or the\n' + 'right side of a variable declaration, ie. `const eq = _ === _`)'));
       isAssign = true;
       caller = decl.get('init');
+      wrapper = (0, _util.findWrapper)(referencePath, true);
     }
 
     const id = caller.scope.generateUidIdentifier('arg');
@@ -44,6 +44,11 @@ function transformPlaceholders(t, refs) {
           replacement = _referencePath$replac2[0];
 
     replacement.setData('_.wasPlaceholder', true);
+
+    if (wrapper) {
+      wrapper.node.params.push(id);
+      return;
+    }
 
     if (!isAssign) {
       const replacementCallee = (0, _util.findTargetCallee)(replacement);

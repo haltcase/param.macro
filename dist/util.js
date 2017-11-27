@@ -40,10 +40,10 @@ function findTargetCaller(path) {
   return (_findTargetCallee = findTargetCallee(path)) === null || _findTargetCallee === void 0 ? void 0 : _findTargetCallee.parentPath;
 }
 
-function findWrapper(path) {
-  const callee = findTargetCallee(path);
+function findWrapper(path, noCallee) {
+  const root = noCallee ? path : findTargetCallee(path);
   let calls = 0;
-  let link = callee;
+  let link = root;
 
   while (link = (_link = link) === null || _link === void 0 ? void 0 : _link.parentPath) {
     var _link;
