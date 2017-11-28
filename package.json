@@ -32,7 +32,8 @@
     "placeholder"
   ],
   "files": [
-    "dist"
+    "dist",
+    "plugin.js"
   ],
   "scripts": {
     "build": "babel src -d dist",
