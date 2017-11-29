@@ -39,8 +39,8 @@ yet, but will return a new function receiving the arguments you signified as
 placeholders. Think of the values that aren't placeholders as being "bound", and
 you'll provide the rest later.
 
-Check out the [examples](#examples) section to see all the different ways
-these are useful.
+Check out the [examples](#examples) section and the [official introduction post][blog]
+if you'd like to see how these can be useful.
 
 ## installation
 
@@ -386,6 +386,7 @@ found are always welcome.
 
 MIT © [Bo Lingen / citycide](https://github.com/citycide)
 
+[blog]: https://medium.com/@citycide/partial-application-lambda-parameters-for-js-aa16f4d94df4
 [babel]: https://babeljs.io
 [babel-cli]: http://babeljs.io/docs/usage/cli/
 [babel-macros]: https://github.com/kentcdodds/babel-macros
