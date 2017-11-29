@@ -1,7 +1,7 @@
 {
-  "name": "partial-application.macro",
+  "name": "param.macro",
   "version": "1.1.2",
-  "description": "Partial application syntax and implicit parameters for JavaScript, inspired by Scala's `_` & Kotlin's `it`",
+  "description": "Partial application syntax and lambda parameters for JavaScript, inspired by Scala's `_` & Kotlin's `it`",
   "author": {
     "name": "Bo Lingen",
     "email": "lingenbw@gmail.com",
@@ -10,10 +10,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/citycide/partial-application.macro.git"
+    "url": "git+https://github.com/citycide/param.macro.git"
   },
-  "homepage": "https://github.com/citycide/partial-application.macro",
-  "bugs": "https://github.com/citycide/partial-application.macro/issues",
+  "homepage": "https://github.com/citycide/param.macro",
+  "bugs": "https://github.com/citycide/param.macro/issues",
   "main": "./dist/index.js",
   "engines": {
     "node": ">=6"
@@ -24,12 +24,12 @@
     "functional",
     "partial",
     "application",
-    "currying",
-    "curried",
+    "curry",
     "scala",
     "kotlin",
     "template",
-    "placeholder"
+    "placeholder",
+    "lambda"
   ],
   "files": [
     "dist",

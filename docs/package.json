@@ -1,19 +1,20 @@
 {
-  "name": "partial-application-playground",
+  "name": "param.macro-playground",
   "version": "1.0.0",
-  "description": "Live coding playground for partial-application.macro",
+  "description": "Live coding playground for param.macro",
+  "private": true,
   "author": {
     "name": "Bo Lingen",
-    "email": "thecitycide@gmail.com",
-    "url": "github.com/citycide"
+    "email": "lingenbw@gmail.com",
+    "url": "https://github.com/citycide"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/citycide/partial-application.macro.git"
+    "url": "git+https://github.com/citycide/param.macro.git"
   },
-  "homepage": "https://github.com/citycide/partial-application.macro",
-  "bugs": "https://github.com/citycide/partial-application.macro/issues",
+  "homepage": "https://github.com/citycide/param.macro",
+  "bugs": "https://github.com/citycide/param.macro/issues",
   "engines": {
     "node": ">=4"
   },

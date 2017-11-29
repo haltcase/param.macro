@@ -1,4 +1,4 @@
-import it from 'partial-application.macro'
+import it from 'param.macro'
 import { findTargetCallee, PartialError } from './util'
 
 export default function transformImplicitParams (t, refs) {

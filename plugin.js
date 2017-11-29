@@ -64,7 +64,7 @@ const applyPlugin = (babel, path, imports) => {
 
 module.exports = babel => {
   return {
-    name: 'partial-application.macro',
+    name,
     visitor: {
       ImportDeclaration (path, state) {
         if (!isImport(path)) return

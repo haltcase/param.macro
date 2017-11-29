@@ -1,4 +1,4 @@
-import { _, it } from 'partial-application.macro'
+import { _, it } from 'param.macro'
 
 import { transform } from '@babel/standalone'
 import { format } from '@oigroup/prettier-babylon'

@@ -5,7 +5,7 @@ node_js:
   - '6'
 
 before_script:
-  - npm link && npm link partial-application.macro
+  - npm link && npm link param.macro
 
 notifications:
   email: false

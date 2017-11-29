@@ -1,8 +1,8 @@
-# partial-application.macro &middot; [![Version](https://img.shields.io/npm/v/partial-application.macro.svg?style=flat-square&maxAge=3600)](https://www.npmjs.com/package/partial-application.macro) [![License](https://img.shields.io/npm/l/partial-application.macro.svg?style=flat-square&maxAge=3600)](https://www.npmjs.com/package/partial-application.macro) [![Travis CI](https://img.shields.io/travis/citycide/partial-application.macro.svg?style=flat-square&maxAge=3600)](https://travis-ci.org/citycide/partial-application.macro) [![JavaScript Standard Style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square&maxAge=3600)](https://standardjs.com)
+# param.macro &middot; [![Version](https://img.shields.io/npm/v/param.macro.svg?style=flat-square&maxAge=3600)](https://www.npmjs.com/package/param.macro) [![License](https://img.shields.io/npm/l/param.macro.svg?style=flat-square&maxAge=3600)](https://www.npmjs.com/package/param.macro) [![Travis CI](https://img.shields.io/travis/citycide/param.macro.svg?style=flat-square&maxAge=3600)](https://travis-ci.org/citycide/param.macro) [![JavaScript Standard Style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square&maxAge=3600)](https://standardjs.com)
 
-> Partial application syntax and implicit parameters for JavaScript, inspired by Scala's `_` & Kotlin's `it`.
+> Partial application syntax and lambda parameters for JavaScript, inspired by Scala's `_` & Kotlin's `it`.
 
-> **try it live** on the **[online playground](https://citycide.github.io/partial-application.macro)**
+> **try it live** on the **[online playground](https://citycide.github.io/param.macro)**
 
 - [overview](#overview)
 - [installation](#installation)
@@ -28,7 +28,7 @@
 
 ## overview
 
-_partial-application.macro_ provides two symbols - `it` and `_`.
+_param.macro_ provides two symbols - `it` and `_`.
 
 `it` can be used in an expression passed to a function which implicitly creates
 a lambda function in place accepting a single argument.
@@ -45,7 +45,7 @@ these are useful.
 ## installation
 
 ```console
-npm i --save-dev partial-application.macro
+npm i --save-dev param.macro
 ```
 
 Make sure you also have [Babel][babel] and [babel-macros][babel-macros]
@@ -69,32 +69,32 @@ module.exports = {
 Then just `import` and use:
 
 ```js
-import { _, it } from 'partial-application.macro'
+import { _, it } from 'param.macro'
 ```
 
 `it` is also the default export, so you could also do:
 
 ```js
-import it from 'partial-application.macro'
+import it from 'param.macro'
 ```
 
 > The benefits of this explicit import are that linters and type systems won't have
 a fit over `_` and `it` not being defined. It's also self-documenting and more easily
 understandable. Anyone looking at your code will know that these symbols come from
-`partial-application.macro`.
+`param.macro`.
 
 ### set custom tokens
 
 You can set custom identifiers for these just by using an aliased import.
 
 ```js
-import { it as IT, _ as PLACEHOLDER } from 'partial-application.macro'
+import { it as IT, _ as PLACEHOLDER } from 'param.macro'
 ```
 
 or for the default `it` export:
 
 ```js
-import IT from 'partial-application.macro'
+import IT from 'param.macro'
 ```
 
 ## examples
@@ -106,7 +106,7 @@ shorthand for passing unary (single-argument) functions to other functions
 (higher order). It's useful in higher order functions like `Array#map()`:
 
 ```js
-import it from 'partial-application.macro'
+import it from 'param.macro'
 
 const people = [
   { name: 'Jeff' },
@@ -123,7 +123,7 @@ people.map(it.name)
 Transform this:
 
 ```js
-import { _ } from 'partial-application.macro'
+import { _ } from 'param.macro'
 
 function sumOfThreeNumbers (x, y, z) {
   return x + y + z
@@ -151,7 +151,7 @@ calls and assigned to a variable. Here are some ultra simple cases to
 demonstrate this:
 
 ```js
-import { _, it } from 'partial-application.macro'
+import { _, it } from 'param.macro'
 
 const identity = it
 const isEqualToItself = it === it
@@ -172,7 +172,7 @@ We could implement a `hasOwn()` function to check if a property exists on an
 object like this:
 
 ```js
-import { _ } from 'partial-application.macro'
+import { _ } from 'param.macro'
 
 const hasOwn = _.hasOwnProperty(_)
 const object = { flammable: true }
@@ -187,7 +187,7 @@ You can also put these macros to use within binary expressions, template literal
 and most other expressions.
 
 ```js
-import { it, _ } from 'partial-application.macro'
+import { it, _ } from 'param.macro'
 
 const log = console.log(_)
 
@@ -239,7 +239,7 @@ A standalone version is also provided for those not already using
   ```js
   module.exports = {
     presets: [],
-    plugins: ['module:partial-application.macro/plugin']
+    plugins: ['module:param.macro/plugin']
   }
   ```
 
@@ -248,13 +248,13 @@ A standalone version is also provided for those not already using
   ```json
   {
     "presets": [],
-    "plugins": ["partial-application.macro/plugin"]
+    "plugins": ["param.macro/plugin"]
   }
   ```
 
 ## differences between `_` and `it`
 
-There are two separate constructs provided by _partial-application.macro_:
+There are two separate constructs provided by _param.macro_:
 
 * `_`: partial application symbol
 * `it`: implicit parameter symbol
@@ -267,8 +267,9 @@ There are a couple of major difference between the two:
 transformed in place. It's easiest to see when we look at a simple example:
 
 ```js
-import { _, it } from 'partial-application.macro'
+import { _, it } from 'param.macro'
 
+const array = [1, 2, 3]
 array.map(_)
 array.map(it)
 ```
@@ -276,7 +277,8 @@ array.map(it)
 While these look like they might be the same, they'll come out acting very different:
 
 ```js
-_arg => return array.map(_arg)
+const array = [1, 2, 3]
+_arg => array.map(_arg)
 array.map(_it => _it)
 ```
 
@@ -286,7 +288,7 @@ array.map(_it => _it)
 argument list. `_` will always refer to the _next_ argument.
 
 ```js
-import { _, it } from 'partial-application.macro'
+import { _, it } from 'param.macro'
 
 console.log(_ + _ + _)
 console.log(it + it + it)
@@ -359,10 +361,10 @@ was provided.
 
 ## development
 
-1. Clone the repo: `git clone https://github.com/citycide/partial-application.macro.git`
-2. Move into the new directory: `cd partial-application.macro`
+1. Clone the repo: `git clone https://github.com/citycide/param.macro.git`
+2. Move into the new directory: `cd param.macro`
 3. Install dependencies: `npm install`
-4. Link the project to itself: `npm link && npm link partial-application.macro`
+4. Link the project to itself: `npm link && npm link param.macro`
 5. Build the source: `npm run build`
 6. Run tests: `npm test`
 
@@ -371,7 +373,7 @@ since it's necessary to build or test
 
 ## contributing
 
-Pull requests and any [issues](https://github.com/citycide/partial-application.macro/issues)
+Pull requests and any [issues](https://github.com/citycide/param.macro/issues)
 found are always welcome.
 
 1. Fork the project, and preferably create a branch named something like `feat-make-better`

@@ -17,14 +17,14 @@ function testMacro (t, input, expected) {
 test(
   'it: unused',
   testMacro,
-  `import { it } from 'partial-application.macro'`,
+  `import { it } from 'param.macro'`,
   ``
 )
 
 test(
   '_: unused',
   testMacro,
-  `import { _ } from 'partial-application.macro'`,
+  `import { _ } from 'param.macro'`,
   ``
 )
 
@@ -32,7 +32,7 @@ test(
   'it: default import is the same as `it` named import',
   testMacro,
   $`
-    import it from 'partial-application.macro'
+    import it from 'param.macro'
     const identity = it
   `,
   $`
@@ -46,7 +46,7 @@ test(
   'it: aliased named import works',
   testMacro,
   $`
-    import { it as IT } from 'partial-application.macro'
+    import { it as IT } from 'param.macro'
     array.map(IT + ' sheckles')
   `,
   $`
@@ -60,7 +60,7 @@ test(
   '_: aliased named import works',
   testMacro,
   $`
-    import { _ as PLACEHOLDER } from 'partial-application.macro'
+    import { _ as PLACEHOLDER } from 'param.macro'
     const toInt = parseInt(PLACEHOLDER, 10)
   `,
   $`
@@ -74,7 +74,7 @@ test(
   'it: transforms `it` arguments to lambda parameters',
   testMacro,
   $`
-    import { it } from 'partial-application.macro'
+    import { it } from 'param.macro'
     const arr = [1, 2, 3].map(it * 2)
   `,
   $`
@@ -88,7 +88,7 @@ test(
   'it: supports nested properties and methods',
   testMacro,
   $`
-    import { it } from 'partial-application.macro'
+    import { it } from 'param.macro'
     const arr1 = array.map(it.foo.bar)
     const arr2 = array.map(it.foo.baz())
   `,
@@ -106,7 +106,7 @@ test(
   'it: lone `it` results in the identity function',
   testMacro,
   $`
-    import { it } from 'partial-application.macro'
+    import { it } from 'param.macro'
     const arr = [1, 2, 3].map(it)
   `,
   $`
@@ -120,7 +120,7 @@ test(
   'it: assignment is the identity function',
   testMacro,
   $`
-    import { it } from 'partial-application.macro'
+    import { it } from 'param.macro'
     const identity = it
   `,
   $`
@@ -134,7 +134,7 @@ test(
   'it: multiple uses always refer to the first parameter',
   testMacro,
   $`
-    import { it } from 'partial-application.macro'
+    import { it } from 'param.macro'
     fn(it + it + it * it)
   `,
   $`
@@ -148,7 +148,7 @@ test(
   '_: partially applies the called function',
   testMacro,
   $`
-    import { _ } from 'partial-application.macro'
+    import { _ } from 'param.macro'
     const log = console.log(_)
   `,
   $`
@@ -162,7 +162,7 @@ test(
   '_: works with multiple placeholders',
   testMacro,
   $`
-    import { _ } from 'partial-application.macro'
+    import { _ } from 'param.macro'
     const log = console.log(_, 1, _, 2, _)
   `,
   $`
@@ -176,7 +176,7 @@ test(
   '_: assigned expressions compile to a single function',
   testMacro,
   $`
-    import { _ } from 'partial-application.macro'
+    import { _ } from 'param.macro'
     const areSameThing = _ === _
     const oneMansIsAnothers = _.trash === _.treasure
   `,
@@ -195,7 +195,7 @@ test(
   '_: hoists complex sibling arguments to prevent multiple executions',
   testMacro,
   $`
-    import { _ } from 'partial-application.macro'
+    import { _ } from 'param.macro'
     const log = console.log(_, {}, foo(), new Person(), 2, _.bar())
   `,
   $`
@@ -212,7 +212,7 @@ test(
   '_: does not hoist nested partial functions',
   testMacro,
   $`
-    import { _ } from 'partial-application.macro'
+    import { _ } from 'param.macro'
     const mapper = map(_, get(_, 'nested.key', 'default'))
   `,
   $`
@@ -228,7 +228,7 @@ test(
   '_: supports nested properties and methods',
   testMacro,
   $`
-    import { _ } from 'partial-application.macro'
+    import { _ } from 'param.macro'
     console.log(_.foo.bar)
     console.log(_.foo.baz())
   `,
