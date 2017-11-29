@@ -265,9 +265,11 @@ if (!getStorage('tourComplete')) {
     }]
   })
 
-  tour.once('complete', () =>
+  const completeTour = () =>
     setStorage('tourComplete', true)
-  )
+
+  tour.once('cancel', completeTour)
+  tour.once('complete', completeTour)
 
   tour.start()
 }
