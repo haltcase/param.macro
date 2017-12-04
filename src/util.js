@@ -51,13 +51,27 @@ export function findWrapper (path, noCallee) {
 }
 
 export function hoistArguments (t, caller) {
-  const args = caller.get('body.body.0.argument.arguments')
+  let args, upper
+  if (caller.isArrowFunctionExpression()) {
+    args = caller.get('body.body.0.argument.arguments')
+    upper = caller.getStatementParent()
+  } else if (caller.isCallExpression()) {
+    args = caller.get('arguments')
+    upper = caller
+      .findParent(it.isArrowFunctionExpression())
+      .getStatementParent()
+  }
+
+  if (!args?.length) return
 
   args.forEach(arg => {
     if (!shouldHoist(arg)) return
 
-    const id = arg.scope.generateUidIdentifier('ref')
-    caller.scope.parent.push({ id, init: arg.node })
+    const id = upper.scope.generateUidIdentifier('ref')
+    const ref = t.variableDeclaration('const', [
+      t.variableDeclarator(id, arg.node)
+    ])
+    upper.insertBefore(ref)
     arg.replaceWith(id)
   })
 }

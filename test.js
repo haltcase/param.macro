@@ -199,8 +199,9 @@ test(
     const log = console.log(_, {}, foo(), new Person(), 2, _.bar())
   `,
   $`
-    var _ref = foo(),
-        _ref2 = new Person();
+    const _ref = foo();
+
+    const _ref2 = new Person();
 
     const log = (_arg, _arg2) => {
       return console.log(_arg, {}, _ref, _ref2, 2, _arg2.bar());
