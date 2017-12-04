@@ -95,8 +95,8 @@ function shouldHoist(path) {
     return wasMacro(_arg);
   });
 
-  return !path.isLiteral() && nonHoistTypes.every(_it2 => {
-    return _it2 !== path.node.type;
+  return !path.isLiteral() && nonHoistTypes.every(_it3 => {
+    return _it3 !== path.node.type;
   }) && !isTransformed() && !hasMacroArgs();
 }
 
