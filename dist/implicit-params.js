@@ -25,11 +25,8 @@ function transformImplicitParams(t, refs) {
     const id = parent.scope.generateUidIdentifier('it');
     parent.scope.rename(referencePath.node.name, id.name);
     const fn = t.arrowFunctionExpression([id], t.blockStatement([t.returnStatement(parent.node)]));
-
-    const _parent$replaceWith = parent.replaceWith(fn),
-          result = _parent$replaceWith[0];
-
-    result.setData('it.wasTransformed', true);
-    result.setData('it.idName', id.name);
+    parent.replaceWith(fn);
+    parent.setData('it.wasTransformed', true);
+    parent.setData('it.idName', id.name);
   });
 }

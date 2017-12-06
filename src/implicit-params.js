@@ -32,8 +32,8 @@ export default function transformImplicitParams (t, refs) {
       ])
     )
 
-    const [result] = parent.replaceWith(fn)
-    result.setData('it.wasTransformed', true)
-    result.setData('it.idName', id.name)
+    parent.replaceWith(fn)
+    parent.setData('it.wasTransformed', true)
+    parent.setData('it.idName', id.name)
   })
 }

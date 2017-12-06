@@ -16,8 +16,8 @@ export default function transformPlaceholders (t, refs) {
 
     if (wrapper) {
       const id = wrapper.scope.generateUidIdentifier('arg')
-      const [replacement] = referencePath.replaceWith(id)
-      const callee = findTargetCallee(replacement)
+      referencePath.replaceWith(id)
+      const callee = findTargetCallee(referencePath)
       callee.setData('_.wasPlaceholder', true)
       wrapper.node.params.push(id)
       return
@@ -39,8 +39,8 @@ export default function transformPlaceholders (t, refs) {
     }
 
     const id = caller.scope.generateUidIdentifier('arg')
-    const [replacement] = referencePath.replaceWith(id)
-    replacement.setData('_.wasPlaceholder', true)
+    referencePath.replaceWith(id)
+    referencePath.setData('_.wasPlaceholder', true)
 
     if (wrapper) {
       wrapper.node.params.push(id)
@@ -48,7 +48,7 @@ export default function transformPlaceholders (t, refs) {
     }
 
     if (!isAssign) {
-      const replacementCallee = findTargetCallee(replacement)
+      const replacementCallee = findTargetCallee(referencePath)
       replacementCallee.setData('_.wasPlaceholder', true)
 
       hoistTargets.push(caller)
@@ -61,8 +61,8 @@ export default function transformPlaceholders (t, refs) {
       ])
     )
 
-    const [result] = caller.replaceWith(fn)
-    result.setData('_.wasPlaceholder', true)
+    caller.replaceWith(fn)
+    caller.setData('_.wasPlaceholder', true)
   })
 
   hoistTargets.forEach(hoistArguments(t, _))

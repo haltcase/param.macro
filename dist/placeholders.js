@@ -12,12 +12,8 @@ function transformPlaceholders(t, refs) {
 
     if (wrapper) {
       const id = wrapper.scope.generateUidIdentifier('arg');
-
-      const _referencePath$replac = referencePath.replaceWith(id),
-            replacement = _referencePath$replac[0];
-
-      const callee = (0, _util.findTargetCallee)(replacement);
-      callee.setData('_.wasPlaceholder', true);
+      referencePath.replaceWith(id);
+      (0, _util.findTargetCallee)(referencePath).setData('_.wasPlaceholder', true);
       wrapper.node.params.push(id);
       return;
     }
@@ -39,11 +35,8 @@ function transformPlaceholders(t, refs) {
     }
 
     const id = caller.scope.generateUidIdentifier('arg');
-
-    const _referencePath$replac2 = referencePath.replaceWith(id),
-          replacement = _referencePath$replac2[0];
-
-    replacement.setData('_.wasPlaceholder', true);
+    referencePath.replaceWith(id);
+    referencePath.setData('_.wasPlaceholder', true);
 
     if (wrapper) {
       wrapper.node.params.push(id);
@@ -51,17 +44,14 @@ function transformPlaceholders(t, refs) {
     }
 
     if (!isAssign) {
-      const replacementCallee = (0, _util.findTargetCallee)(replacement);
+      const replacementCallee = (0, _util.findTargetCallee)(referencePath);
       replacementCallee.setData('_.wasPlaceholder', true);
       hoistTargets.push(caller);
     }
 
     const fn = t.arrowFunctionExpression([id], t.blockStatement([t.returnStatement(caller.node)]));
-
-    const _caller$replaceWith = caller.replaceWith(fn),
-          result = _caller$replaceWith[0];
-
-    result.setData('_.wasPlaceholder', true);
+    caller.replaceWith(fn);
+    caller.setData('_.wasPlaceholder', true);
   });
   hoistTargets.forEach((_arg) => {
     return (0, _util.hoistArguments)(t, _arg);
