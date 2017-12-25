@@ -4,37 +4,37 @@
 
 > **try it live** on the **[online playground](https://citycide.github.io/param.macro)**
 
-- [overview](#overview)
-- [installation](#installation)
-  - [set custom tokens](#set-custom-tokens)
-- [examples & features](#examples)
-  - [lambda parameters](#lambda-parameters): `utensilList.find(it.isFork())`
-  - [argument placeholders](#argument-placeholders): `add(1, _)`
-  - [in assignments](#_-and-it-in-assignments): `const areSameThing = _ === _`
-  - [other expressions](#other-expressions): `it.getPower().level > 9000`, ``const greet = `Hello, ${_}!` ``
-- [usage](#usage)
-  - [Babel v7](#babelrcjs-babel-v7)
-  - [Babel v6](#babelrc-babel-v6)
-  - [standalone plugin](#standalone-plugin)
-- [differences between `_` and `it`](#differences-between-_-and-it)
-- [caveats & limitations](#caveats--limitations)
-- [comparison to libraries](#comparison-to-libraries)
-- [see also](#see-also)
-- [development](#development)
-- [contributing](#contributing)
-- [license](#license)
+* [overview](#overview)
+* [installation](#installation)
+  * [set custom tokens](#set-custom-tokens)
+* [examples & features](#examples)
+  * [lambda parameters](#lambda-parameters): `utensilList.find(it.isFork())`
+  * [argument placeholders](#argument-placeholders): `add(1, _)`
+  * [in assignments](#_-and-it-in-assignments): `const areSameThing = _ === _`
+  * [other expressions](#other-expressions): `it.getPower().level > 9000`, ``const greet = `Hello, ${_}!` ``
+* [usage](#usage)
+  * [Babel v7](#babelrcjs-babel-v7)
+  * [Babel v6](#babelrc-babel-v6)
+  * [standalone plugin](#standalone-plugin)
+* [differences between `_` and `it`](#differences-between-_-and-it)
+* [caveats & limitations](#caveats--limitations)
+* [comparison to libraries](#comparison-to-libraries)
+* [see also](#see-also)
+* [development](#development)
+* [contributing](#contributing)
+* [license](#license)
 
 ---
 
 ## overview
 
-_param.macro_ provides two symbols - `it` and `_`.
+_param.macro_ provides two symbols &mdash; `it` and `_`.
 
 `it` can be used in an expression passed to a function which implicitly creates
 a lambda function in place accepting a single argument.
 
 The `_` symbol is inspired by Scala and is used as a placeholder to signal that
-a function call is partially applied - the original code isn't actually called
+a function call is partially applied &mdash; the original code isn't actually called
 yet, but will return a new function receiving the arguments you signified as
 placeholders. Think of the values that aren't placeholders as being "bound", and
 you'll provide the rest later.
@@ -101,9 +101,9 @@ import IT from 'param.macro'
 
 ### lambda parameters
 
-Scala, Kotlin, etc have what's called a _lambda parameter_ - an easy
-shorthand for passing unary (single-argument) functions to other functions
-(higher order). It's useful in higher order functions like `Array#map()`:
+Scala, Kotlin, etc have what's called a _lambda parameter_ &mdash; an easy shorthand
+for passing unary (single-argument) functions to other functions (higher order).
+It's useful in higher order functions like `Array#map()`:
 
 ```js
 import it from 'param.macro'
@@ -146,9 +146,8 @@ const oneAndTwoPlusOther = _arg => {
 
 ### `_` and `it` in assignments
 
-Most expressions using `_` and `it` can also be used outside function
-calls and assigned to a variable. Here are some ultra simple cases to
-demonstrate this:
+Most expressions using `_` and `it` can also be used outside function calls and
+assigned to a variable. Here are some ultra simple cases to demonstrate this:
 
 ```js
 import { _, it } from 'param.macro'
@@ -255,8 +254,8 @@ A standalone version is also provided for those not already using `babel-plugin-
 
 There are two separate constructs provided by _param.macro_:
 
-* `_`: partial application symbol
-* `it`: implicit parameter symbol
+* `_` &rarr; partial application symbol
+* `it` &rarr; implicit parameter symbol
 
 There are a couple of major difference between the two:
 
@@ -309,30 +308,30 @@ commonly used as the identifier for things like lodash's collection of utilities
 
 There are a few reasons this is totally fine.
 
-1. `_` is a common symbol for partial application
+1. The plugin allows for [custom symbols][#set-custom-tokens]
 
-    The Scala language uses the underscore as a placeholder for partially
-    applied functions, and tons of JavaScript libraries have also used it -
-    so it's become recognizable.
+    If you do happen to need `_` or `it` as identifiers, you're able to change
+    the imported symbols (using standard aliased imports) to anything you want.
 
-2. Monolithic builds of packages like lodash are on the way out
+2. `_` is a common symbol for partial application
 
-    lodash v5 will be getting rid of the monolithic build in favor
-    of explicitly imported or 'cherry-picked' utilities. So it will
-    become less common to see the entirety of lodash imported,
-    especially with ES module tree-shaking on the horizon.
+    The Scala language uses the underscore as a placeholder for partially applied
+    functions, and tons of JavaScript libraries have also used it &mdash; so it's become
+    recognizable.
 
-    On top of that, [babel-plugin-lodash][babel-lodash] still works
-    effectively when you just import what you need like this:
+3. Monolithic builds of packages like lodash are on the way out
+
+    lodash v5 will be getting rid of the monolithic build in favor of explicitly
+    imported or 'cherry-picked' utilities. So it will become less common to see
+    the entirety of lodash imported, especially with ES module tree-shaking on
+    the horizon.
+
+    On top of that, [babel-plugin-lodash][babel-lodash] still works effectively
+    when you just import what you need like this:
 
     ```js
     import { add } from 'lodash'
     ```
-
-3. The plugin allows for [custom symbols][#set-custom-tokens]
-
-    If you do happen to need `_` or `it` as identifiers, you're able to change
-    the imported symbols (using standard aliased imports) to anything you want.
 
 4. Partial application with `_` is damn cool
 
@@ -352,11 +351,11 @@ was provided.
 
 ## see also
 
-- [TC39 proposal][proposal] - official syntactic proposal to the TC39 JavaScript standard
-- [babel-plugin-partial-application][bppa] - precursor to this project, more features but less stable
-- [lodash/fp][lodash-fp] - functional adaptation of the great Lodash utility library
-- [Ramda][ramda] - highly functional programming-oriented utility library
-- [babel-plugin-transform-scala-lambda][scala-lambda] - a similar plugin for more limited Scala-like lambda syntax
+* [TC39 proposal][proposal] &ndash; official syntactic proposal to the TC39 JavaScript standard
+* [babel-plugin-partial-application][bppa] &ndash; precursor to this project, more features but less stable
+* [lodash/fp][lodash-fp] &ndash; functional adaptation of the great Lodash utility library
+* [Ramda][ramda] &ndash; highly functional programming-oriented utility library
+* [babel-plugin-transform-scala-lambda][scala-lambda] &ndash; a similar plugin for more limited Scala-like lambda syntax
 
 ## development
 
@@ -367,8 +366,8 @@ was provided.
 5. Build the source: `npm run build`
 6. Run tests: `npm test`
 
-> this project runs on itself, so take note of the `npm link` step
-since it's necessary to build or test
+> this project uses itself in its source, so take note of the `npm link`
+step since it's necessary to build or test
 
 ## contributing
 
@@ -376,7 +375,7 @@ Pull requests and any [issues](https://github.com/citycide/param.macro/issues)
 found are always welcome.
 
 1. Fork the project, and preferably create a branch named something like `feat-make-better`
-2. Follow the build steps [above][#development] but using your forked repo
+2. Follow the build steps [above](#development) but using your forked repo
 3. Modify the source files in the `src` directory as needed
 4. Make sure all tests continue to pass, and it never hurts to have more tests
 5. Push & pull request! :tada:
