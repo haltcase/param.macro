@@ -48,11 +48,11 @@ if you'd like to see how these can be useful.
 npm i --save-dev param.macro
 ```
 
-Make sure you also have [Babel][babel] and [babel-macros][babel-macros]
-installed (the following use Babel v7):
+Make sure you also have [Babel][babel] and [babel-plugin-macros][babel-plugin-macros]
+installed (the following use Babel v7, see [_usage_](#usage) for more):
 
 ```console
-npm i --save-dev @babel/cli @babel/core babel-macros
+npm i --save-dev @babel/cli @babel/core babel-plugin-macros
 ```
 
 ... and configured with Babel:
@@ -60,11 +60,11 @@ npm i --save-dev @babel/cli @babel/core babel-macros
 ```js
 module.exports = {
   presets: [],
-  plugins: ['module:babel-macros']
+  plugins: ['babel-plugin-macros']
 }
 ```
 
-> for usage without `babel-macros`, see [_standalone plugin_](#standalone-plugin)
+> for usage without `babel-plugin-macros`, see [_standalone plugin_](#standalone-plugin)
 
 Then just `import` and use:
 
@@ -216,7 +216,7 @@ log(greet('world'))
 ```js
 module.exports = {
   presets: [],
-  plugins: ['module:babel-macros']
+  plugins: ['babel-plugin-macros']
 }
 ```
 
@@ -225,14 +225,13 @@ module.exports = {
 ```json
 {
   "presets": [],
-  "plugins": ["babel-macros"]
+  "plugins": ["babel-plugin-macros"]
 }
 ```
 
 ### standalone plugin
 
-A standalone version is also provided for those not already using
-`babel-macros`:
+A standalone version is also provided for those not already using `babel-plugin-macros`:
 
 * .babelrc.js (Babel v7)
 
@@ -389,7 +388,7 @@ MIT © [Bo Lingen / citycide](https://github.com/citycide)
 [blog]: https://medium.com/@citycide/partial-application-lambda-parameters-for-js-aa16f4d94df4
 [babel]: https://babeljs.io
 [babel-cli]: http://babeljs.io/docs/usage/cli/
-[babel-macros]: https://github.com/kentcdodds/babel-macros
+[babel-plugin-macros]: https://github.com/kentcdodds/babel-plugin-macros
 [babel-lodash]: https://github.com/lodash/babel-plugin-lodash
 [proposal]: https://github.com/rbuckton/proposal-partial-application
 [lodash]: https://github.com/lodash/lodash
