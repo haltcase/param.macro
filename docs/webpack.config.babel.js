@@ -23,7 +23,7 @@ module.exports = {
             }],
             '@babel/stage-0'
           ],
-          plugins: ['module:babel-macros']
+          plugins: ['babel-plugin-macros']
         }
       }
     }, {
