@@ -205,7 +205,26 @@ const greet = `Hello, ${_}!`
 
 log(greet('world'))
 // -> Hello, world!
+```
 
+It's especially fun to use with the pipeline operator since it basically removes
+the need to auto-curry an entire library's API (like [Ramda][ramda]), which can be
+pretty costly for performance.
+
+This is a scenario specifically tested against to ensure compatibility:
+
+```js
+import { _, it } from 'param.macro'
+
+const add = _ + _
+const tenPlusString =
+  it
+  |> parseInt(_, 10)
+  |> add(10, _)
+  |> String
+
+tenPlusString('10') |> console.log
+// -> 20
 ```
 
 ## usage
