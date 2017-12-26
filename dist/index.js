@@ -1,6 +1,6 @@
 "use strict";
 
-var _babelMacros = require("babel-macros");
+var _babelPluginMacros = require("babel-plugin-macros");
 
 var _placeholders = _interopRequireDefault(require("./placeholders"));
 
@@ -21,4 +21,4 @@ function transform({
   if (references._) (0, _placeholders.default)(t, references._);
 }
 
-module.exports = (0, _babelMacros.createMacro)(transform);
+module.exports = (0, _babelPluginMacros.createMacro)(transform);
