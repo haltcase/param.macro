@@ -1,7 +1,7 @@
 import { _, it } from 'param.macro'
 
-import { transform } from '@babel/standalone'
-import { format } from '@oigroup/prettier-babylon'
+import { availablePlugins, transform } from '@babel/standalone'
+import { format } from '@citycide/prettier-babylon'
 import highlight from 'highlight.js/lib/highlight'
 import javascript from 'highlight.js/lib/languages/javascript'
 import debounce from 'lodash.debounce'
@@ -24,7 +24,7 @@ function setStorage (key, value) {
   } catch {}
 }
 
-const $ = document.querySelector.bind(document)
+const $ = document.querySelector(_)
 
 const helpButton = $('.right .material-icons.help')
 const helpModal = $('#help-modal')
@@ -313,6 +313,17 @@ const tryEval = debounce(input => {
   result.setValue('')
   console.clear()
 
+  let runnable
+  try {
+    runnable = transform(input, {
+      presets: ['stage-0']
+    }).code
+  } catch (e) {
+    console.error(e)
+    result.setValue(e.message)
+    return
+  }
+
   try {
     const capturer = Object.create(console)
 
@@ -328,15 +339,15 @@ const tryEval = debounce(input => {
       }
     }
 
-    Function('console', input)(capturer)
+    Function('console', runnable)(capturer)
     if (output) result.setValue(output)
     else result.setValue('')
 
-    transform(input, {
-      presets: [],
+    transform(runnable, {
       plugins: [logger]
     })
   } catch (e) {
+    console.error(e)
     result.setValue(e.message)
   } finally {
     result.clearSelection()
@@ -356,10 +367,15 @@ const persist = debounce(state => {
 
 editor.getSession().on('change', debounce(handleCodeChange, 200))
 
+const syntaxPlugins = Object.keys(availablePlugins)
+  .filter(it.startsWith('syntax'))
+
+const compilerPlugins = [...syntaxPlugins, plugin]
+
 const compileSource = source =>
   transform(source, {
     presets: [],
-    plugins: [plugin]
+    plugins: compilerPlugins
   }).code
 
 const formatCompiled = format(_, {
