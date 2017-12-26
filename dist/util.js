@@ -1,10 +1,15 @@
 "use strict";
 
 exports.__esModule = true;
+exports.findParentUntil = findParentUntil;
+exports.findTargetAssignment = findTargetAssignment;
 exports.findTargetCallee = findTargetCallee;
 exports.findTargetCaller = findTargetCaller;
+exports.findTopmostLink = findTopmostLink;
 exports.findWrapper = findWrapper;
 exports.hoistArguments = hoistArguments;
+exports.getParamNode = getParamNode;
+exports.markPlaceholder = markPlaceholder;
 exports.shouldHoist = shouldHoist;
 exports.wasMacro = wasMacro;
 exports.PartialError = void 0;
@@ -24,12 +29,49 @@ let PartialError = class PartialError extends Error {
 };
 exports.PartialError = PartialError;
 
-function findTargetCallee(path) {
-  if (path.listKey === 'arguments') {
-    return path;
+function isPipeline(path, child) {
+  return path.isBinaryExpression({
+    operator: '|>'
+  }) && (!child || path.get('right') === child);
+}
+
+function findParentUntil(path, pred, accumulate) {
+  let link = path;
+
+  while ((_link = link) === null || _link === void 0 ? void 0 : _link.parentPath) {
+    var _link;
+
+    const parent = link.parentPath;
+    const result = pred(parent, link);
+    if (result === true) return link;
+    if (result) return result;
+    if (result === false) break;
+    link = parent;
   }
 
-  return path.findParent(_it => {
+  return accumulate ? link : null;
+}
+
+function findTargetAssignment(path) {
+  var _ref, _path;
+
+  let calls = 0;
+  return _ref = (_path = path, findTopmostLink(_path)), ((_arg) => {
+    return findParentUntil(_arg, (parent, link) => {
+      if (isPipeline(parent, link)) return false;
+      if (parent.isCallExpression() && ++calls > 0) return false; // parent.isObjectProperty() -> parent.get('value')
+
+      if (parent.isVariableDeclarator()) {
+        return parent.get('init');
+      } else if (parent.isAssignmentPattern()) {
+        return parent.get('right');
+      }
+    });
+  })(_ref);
+}
+
+function findTargetCallee(path) {
+  return path.find(_it => {
     return _it.listKey === 'arguments';
   });
 }
@@ -40,23 +82,36 @@ function findTargetCaller(path) {
   return (_findTargetCallee = findTargetCallee(path)) === null || _findTargetCallee === void 0 ? void 0 : _findTargetCallee.parentPath;
 }
 
+function findTopmostLink(path) {
+  var _path2;
+
+  return _path2 = path, ((_arg2) => {
+    return findParentUntil(_arg2, (parent, link) => {
+      const isCalleeTail = () => parent.isCallExpression() && parent.get('callee') === link;
+
+      const isUnary = () => parent.isUnaryExpression() && parent.get('argument') === link;
+
+      const isBinary = () => parent.isBinaryExpression() && parent.node.operator !== '|>';
+
+      if (!parent.isMemberExpression() && !isBinary() && !isCalleeTail() && !isUnary()) return false;
+    }, true);
+  })(_path2);
+}
+
 function findWrapper(path, noCallee) {
+  var _root;
+
   const root = noCallee ? path : findTargetCallee(path);
   let calls = 0;
-  let link = root;
+  return _root = root, ((_arg3) => {
+    return findParentUntil(_arg3, (parent, link) => {
+      if (isPipeline(parent, link) || parent.isCallExpression() && ++calls > 1) return false;
 
-  while (link = (_link = link) === null || _link === void 0 ? void 0 : _link.parentPath) {
-    var _link;
-
-    if (link.isCallExpression()) calls++;
-    if (calls > 1) break;
-
-    if (link.isArrowFunctionExpression() && wasMacro(link)) {
-      return link;
-    }
-  }
-
-  return null;
+      if (parent.isArrowFunctionExpression() && wasMacro(parent)) {
+        return parent;
+      }
+    });
+  })(_root);
 }
 
 function hoistArguments(t, caller) {
@@ -84,15 +139,27 @@ function hoistArguments(t, caller) {
   });
 }
 
+function getParamNode(t, sourcePath, arg) {
+  if (sourcePath.parentPath.isSpreadElement()) {
+    return t.restElement(arg);
+  } else {
+    return arg;
+  }
+}
+
+function markPlaceholder(path) {
+  path.setData('_.wasPlaceholder', true);
+}
+
 function shouldHoist(path) {
   const isTransformed = () => {
-    var _ref, _path;
+    var _ref2, _path3;
 
-    return _ref = (_path = path, findTargetCallee(_path)), wasMacro(_ref);
+    return _ref2 = (_path3 = path, findTargetCallee(_path3)), wasMacro(_ref2);
   };
 
-  const hasMacroArgs = () => path.isCallExpression() && path.get('arguments').some((_arg) => {
-    return wasMacro(_arg);
+  const hasMacroArgs = () => path.isCallExpression() && path.get('arguments').some((_arg4) => {
+    return wasMacro(_arg4);
   });
 
   return !path.isLiteral() && nonHoistTypes.every(_it3 => {

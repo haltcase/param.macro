@@ -21,33 +21,87 @@ export class PartialError extends Error {
   }
 }
 
-export function findTargetCallee (path) {
-  if (path.listKey === 'arguments') {
-    return path
+function isPipeline (path, child) {
+  return (
+    path.isBinaryExpression({ operator: '|>' }) &&
+    (!child || path.get('right') === child)
+  )
+}
+
+export function findParentUntil (path, pred, accumulate) {
+  let link = path
+  while (link?.parentPath) {
+    const parent = link.parentPath
+    const result = pred(parent, link)
+    if (result === true) return link
+    if (result) return result
+    if (result === false) break
+    link = parent
   }
 
-  return path.findParent(it.listKey === 'arguments')
+  return accumulate ? link : null
+}
+
+export function findTargetAssignment (path) {
+  let calls = 0
+  return path |> findTopmostLink |> findParentUntil(_, (parent, link) => {
+    if (isPipeline(parent, link)) return false
+    if (parent.isCallExpression() && ++calls > 0) return false
+
+    // parent.isObjectProperty() -> parent.get('value')
+    if (parent.isVariableDeclarator()) {
+      return parent.get('init')
+    } else if (parent.isAssignmentPattern()) {
+      return parent.get('right')
+    }
+  })
+}
+
+export function findTargetCallee (path) {
+  return path.find(it.listKey === 'arguments')
 }
 
 export function findTargetCaller (path) {
   return findTargetCallee(path)?.parentPath
 }
 
+export function findTopmostLink (path) {
+  return path |> findParentUntil(_, (parent, link) => {
+    const isCalleeTail = () =>
+      parent.isCallExpression() &&
+      parent.get('callee') === link
+
+    const isUnary = () =>
+      parent.isUnaryExpression() &&
+      parent.get('argument') === link
+
+    const isBinary = () =>
+      parent.isBinaryExpression() &&
+      parent.node.operator !== '|>'
+
+    if (
+      !parent.isMemberExpression() &&
+      !isBinary() &&
+      !isCalleeTail() &&
+      !isUnary()
+    ) return false
+  }, true)
+}
+
 export function findWrapper (path, noCallee) {
   const root = noCallee ? path : findTargetCallee(path)
-
   let calls = 0
-  let link = root
-  while ((link = link?.parentPath)) {
-    if (link.isCallExpression()) calls++
-    if (calls > 1) break
 
-    if (link.isArrowFunctionExpression() && wasMacro(link)) {
-      return link
+  return root |> findParentUntil(_, (parent, link) => {
+    if (
+      isPipeline(parent, link) ||
+      (parent.isCallExpression() && ++calls > 1)
+    ) return false
+
+    if (parent.isArrowFunctionExpression() && wasMacro(parent)) {
+      return parent
     }
-  }
-
-  return null
+  })
 }
 
 export function hoistArguments (t, caller) {
@@ -74,6 +128,18 @@ export function hoistArguments (t, caller) {
     upper.insertBefore(ref)
     arg.replaceWith(id)
   })
+}
+
+export function getParamNode (t, sourcePath, arg) {
+  if (sourcePath.parentPath.isSpreadElement()) {
+    return t.restElement(arg)
+  } else {
+    return arg
+  }
+}
+
+export function markPlaceholder (path) {
+  path.setData('_.wasPlaceholder', true)
 }
 
 export function shouldHoist (path) {

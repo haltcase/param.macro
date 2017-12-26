@@ -1,11 +1,15 @@
-import { _, it } from 'param.macro'
+import { _ } from 'param.macro'
 
 import {
   PartialError,
+  findTargetAssignment,
   findTargetCallee,
   findTargetCaller,
+  findTopmostLink,
   findWrapper,
-  hoistArguments
+  hoistArguments,
+  getParamNode,
+  markPlaceholder
 } from './util'
 
 export default function transformPlaceholders (t, refs) {
@@ -16,53 +20,54 @@ export default function transformPlaceholders (t, refs) {
 
     if (wrapper) {
       const id = wrapper.scope.generateUidIdentifier('arg')
+      const param = getParamNode(t, referencePath, id)
       referencePath.replaceWith(id)
-      const callee = findTargetCallee(referencePath)
-      callee.setData('_.wasPlaceholder', true)
-      wrapper.node.params.push(id)
+      referencePath |> findTargetCallee |> markPlaceholder
+      wrapper.node.params.push(param)
       return
     }
 
-    let caller = findTargetCaller(referencePath)
-    let isAssign = false
-    if (!caller) {
-      const decl =
-        referencePath.findParent(it.isVariableDeclarator()) ??
-        throw new PartialError(
-          'Placeholders must be used as function arguments or the\n' +
-          'right side of a variable declaration, ie. `const eq = _ === _`)'
-        )
-
-      isAssign = true
-      caller = decl.get('init')
+    let isAssign = true
+    let caller = findTargetAssignment(referencePath)
+    if (caller) {
       wrapper = findWrapper(referencePath, true)
+    } else {
+      isAssign = false
+      caller = findTargetCaller(referencePath)
+    }
+
+    if (!caller) {
+      throw new PartialError(
+        'Placeholders must be used as function arguments or the\n' +
+        'right side of a variable declaration, ie. `const eq = _ === _`)'
+      )
     }
 
     const id = caller.scope.generateUidIdentifier('arg')
+    const param = getParamNode(t, referencePath, id)
     referencePath.replaceWith(id)
-    referencePath.setData('_.wasPlaceholder', true)
+    referencePath |> markPlaceholder
 
     if (wrapper) {
-      wrapper.node.params.push(id)
+      wrapper.node.params.push(param)
       return
     }
 
     if (!isAssign) {
-      const replacementCallee = findTargetCallee(referencePath)
-      replacementCallee.setData('_.wasPlaceholder', true)
-
+      referencePath |> findTargetCallee |> markPlaceholder
       hoistTargets.push(caller)
     }
 
+    const tail = findTopmostLink(caller)
     const fn = t.arrowFunctionExpression(
-      [id],
+      [param],
       t.blockStatement([
-        t.returnStatement(caller.node)
+        t.returnStatement(tail.node)
       ])
     )
 
-    caller.replaceWith(fn)
-    caller.setData('_.wasPlaceholder', true)
+    tail.replaceWith(fn)
+    tail |> markPlaceholder
   })
 
   hoistTargets.forEach(hoistArguments(t, _))

@@ -1,4 +1,4 @@
-import { createMacro } from 'babel-macros'
+import { createMacro } from 'babel-plugin-macros'
 
 import transformPlaceholders from './placeholders'
 import transformImplicitParams from './implicit-params'

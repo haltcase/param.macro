@@ -1,11 +1,14 @@
-import it from 'param.macro'
-import { findTargetCallee, PartialError } from './util'
+import {
+  PartialError,
+  findTargetAssignment,
+  findTargetCallee
+} from './util'
 
 export default function transformImplicitParams (t, refs) {
   refs.forEach(referencePath => {
     const parent =
-      findTargetCallee(referencePath) ??
-      referencePath.findParent(it.isVariableDeclarator())?.get('init')
+      findTargetAssignment(referencePath) ||
+      findTargetCallee(referencePath)
 
     if (!parent) {
       throw new PartialError(

@@ -7,11 +7,7 @@ var _util = require("./util");
 
 function transformImplicitParams(t, refs) {
   refs.forEach(referencePath => {
-    var _findTargetCallee, _referencePath$findPa;
-
-    const parent = (_findTargetCallee = (0, _util.findTargetCallee)(referencePath)) !== null && _findTargetCallee !== void 0 ? _findTargetCallee : (_referencePath$findPa = referencePath.findParent(_it => {
-      return _it.isVariableDeclarator();
-    })) === null || _referencePath$findPa === void 0 ? void 0 : _referencePath$findPa.get('init');
+    const parent = (0, _util.findTargetAssignment)(referencePath) || (0, _util.findTargetCallee)(referencePath);
 
     if (!parent) {
       throw new _util.PartialError('Implicit parameters must be used as function arguments or the\n' + 'right side of a variable declaration, ie. `const identity = it`)');
