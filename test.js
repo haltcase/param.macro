@@ -1,41 +1,76 @@
 import test from 'ava'
 
-import { transformSync } from '@babel/core'
-import macros from 'babel-macros'
-import $ from 'dedent'
+import { exec } from 'child_process'
+import { EOL } from 'os'
 
-function testMacro (t, input, expected) {
-  const output = transformSync(input, {
+import { transform as transform7 } from '@babel/core'
+import { transform as transform6 } from 'babel-core'
+import macros from 'babel-plugin-macros'
+import dedent from 'dedent'
+
+const blankLines = /(^[ \t]*\n)/gm
+
+// Babel 6 & Babel 7 have different line breaks in output code
+// using this ensures the output is the same between the two
+const stripBlankLines = code => code.replace(blankLines, '')
+
+const getSyntaxPlugins = () => new Promise((resolve, reject) => {
+  exec('npm ls --parseable', (err, stdout, stderr) => {
+    if (err && !err.message.includes('extraneous')) {
+      return reject(err)
+    }
+
+    resolve(
+      stdout.split(EOL)
+      .filter(path => path.includes('@babel/plugin-syntax-'))
+      .map(path => path.slice(path.indexOf('@babel')))
+    )
+  })
+})
+
+const syntaxPlugins = getSyntaxPlugins()
+
+const babel6 = (t, input, expected) => {
+  const normalizedInput = dedent(input)
+  const output = transform6(normalizedInput, {
     babelrc: false,
     plugins: [macros],
-    filename: __filename,
+    filename: __filename
   }).code.trim()
 
-  t.is(output, expected)
+  t.is(stripBlankLines(output), stripBlankLines(dedent(expected)))
 }
+
+babel6.title = name => `(babel 6) ${name}`
+
+const babel7 = async (t, input, expected) => {
+  const normalizedInput = dedent(input)
+  const output = transform7(normalizedInput, {
+    babelrc: false,
+    plugins: [...await syntaxPlugins, macros],
+    filename: __filename
+  }).code.trim()
+
+  t.is(stripBlankLines(output), stripBlankLines(dedent(expected)))
+}
+
+babel7.title = name => `(babel 7) ${name}`
 
 test(
   'it: unused',
-  testMacro,
+  [babel7, babel6],
   `import { it } from 'param.macro'`,
   ``
 )
 
 test(
-  '_: unused',
-  testMacro,
-  `import { _ } from 'param.macro'`,
-  ``
-)
-
-test(
   'it: default import is the same as `it` named import',
-  testMacro,
-  $`
+  [babel7, babel6],
+  `
     import it from 'param.macro'
     const identity = it
   `,
-  $`
+  `
     const identity = _it => {
       return _it;
     };
@@ -44,12 +79,12 @@ test(
 
 test(
   'it: aliased named import works',
-  testMacro,
-  $`
+  [babel7, babel6],
+  `
     import { it as IT } from 'param.macro'
     array.map(IT + ' sheckles')
   `,
-  $`
+  `
     array.map(_it => {
       return _it + ' sheckles';
     });
@@ -57,27 +92,13 @@ test(
 )
 
 test(
-  '_: aliased named import works',
-  testMacro,
-  $`
-    import { _ as PLACEHOLDER } from 'param.macro'
-    const toInt = parseInt(PLACEHOLDER, 10)
-  `,
-  $`
-    const toInt = (_arg) => {
-      return parseInt(_arg, 10);
-    };
-  `
-)
-
-test(
   'it: transforms `it` arguments to lambda parameters',
-  testMacro,
-  $`
+  [babel7, babel6],
+  `
     import { it } from 'param.macro'
     const arr = [1, 2, 3].map(it * 2)
   `,
-  $`
+  `
     const arr = [1, 2, 3].map(_it => {
       return _it * 2;
     });
@@ -86,13 +107,13 @@ test(
 
 test(
   'it: supports nested properties and methods',
-  testMacro,
-  $`
+  [babel7, babel6],
+  `
     import { it } from 'param.macro'
     const arr1 = array.map(it.foo.bar)
     const arr2 = array.map(it.foo.baz())
   `,
-  $`
+  `
     const arr1 = array.map(_it => {
       return _it.foo.bar;
     });
@@ -104,12 +125,12 @@ test(
 
 test(
   'it: lone `it` results in the identity function',
-  testMacro,
-  $`
+  [babel7, babel6],
+  `
     import { it } from 'param.macro'
     const arr = [1, 2, 3].map(it)
   `,
-  $`
+  `
     const arr = [1, 2, 3].map(_it => {
       return _it;
     });
@@ -117,13 +138,13 @@ test(
 )
 
 test(
-  'it: assignment is the identity function',
-  testMacro,
-  $`
+  'it: simple assignment is the identity function',
+  [babel7, babel6],
+  `
     import { it } from 'param.macro'
     const identity = it
   `,
-  $`
+  `
     const identity = _it => {
       return _it;
     };
@@ -132,12 +153,12 @@ test(
 
 test(
   'it: multiple uses always refer to the first parameter',
-  testMacro,
-  $`
+  [babel7, babel6],
+  `
     import { it } from 'param.macro'
     fn(it + it + it * it)
   `,
-  $`
+  `
     fn(_it => {
       return _it + _it + _it * _it;
     });
@@ -145,13 +166,34 @@ test(
 )
 
 test(
+  'it: supports default parameters',
+  [babel7, babel6],
+  `
+    import { it } from 'param.macro'
+    const fn = (a = it + it) => {}
+  `,
+  `
+    const fn = (a = _it => {
+      return _it + _it;
+    }) => {};
+  `
+)
+
+test(
+  '_: unused',
+  [babel7, babel6],
+  `import { _ } from 'param.macro'`,
+  ``
+)
+
+test(
   '_: partially applies the called function',
-  testMacro,
-  $`
+  [babel7, babel6],
+  `
     import { _ } from 'param.macro'
     const log = console.log(_)
   `,
-  $`
+  `
     const log = (_arg) => {
       return console.log(_arg);
     };
@@ -159,13 +201,27 @@ test(
 )
 
 test(
+  '_: aliased named import works',
+  [babel7, babel6],
+  `
+    import { _ as PLACEHOLDER } from 'param.macro'
+    const toInt = parseInt(PLACEHOLDER, 10)
+  `,
+  `
+    const toInt = (_arg) => {
+      return parseInt(_arg, 10);
+    };
+  `
+)
+
+test(
   '_: works with multiple placeholders',
-  testMacro,
-  $`
+  [babel7, babel6],
+  `
     import { _ } from 'param.macro'
     const log = console.log(_, 1, _, 2, _)
   `,
-  $`
+  `
     const log = (_arg, _arg2, _arg3) => {
       return console.log(_arg, 1, _arg2, 2, _arg3);
     };
@@ -174,13 +230,13 @@ test(
 
 test(
   '_: assigned expressions compile to a single function',
-  testMacro,
-  $`
+  [babel7, babel6],
+  `
     import { _ } from 'param.macro'
     const areSameThing = _ === _
     const oneMansIsAnothers = _.trash === _.treasure
   `,
-  $`
+  `
     const areSameThing = (_arg, _arg2) => {
       return _arg === _arg2;
     };
@@ -193,12 +249,12 @@ test(
 
 test(
   '_: hoists complex sibling arguments to prevent multiple executions',
-  testMacro,
-  $`
+  [babel7, babel6],
+  `
     import { _ } from 'param.macro'
     const log = console.log(_, {}, foo(), new Person(), 2, _.bar())
   `,
-  $`
+  `
     const _ref = foo();
 
     const _ref2 = new Person();
@@ -211,12 +267,12 @@ test(
 
 test(
   '_: does not hoist nested partial functions',
-  testMacro,
-  $`
+  [babel7, babel6],
+  `
     import { _ } from 'param.macro'
     const mapper = map(_, get(_, 'nested.key', 'default'))
   `,
-  $`
+  `
     const mapper = (_arg) => {
       return map(_arg, (_arg2) => {
         return get(_arg2, 'nested.key', 'default');
@@ -227,13 +283,13 @@ test(
 
 test(
   '_: supports nested properties and methods',
-  testMacro,
-  $`
+  [babel7, babel6],
+  `
     import { _ } from 'param.macro'
     console.log(_.foo.bar)
     console.log(_.foo.baz())
   `,
-  $`
+  `
     (_arg) => {
       return console.log(_arg.foo.bar);
     };
@@ -241,5 +297,119 @@ test(
     (_arg2) => {
       return console.log(_arg2.foo.baz());
     };
+  `
+)
+
+// can't test this in Babel 6 because the pipeline operator is Babel 7 only
+test(
+  '_: does not traverse out of pipelined expressions',
+  [babel7],
+  `
+    import { _, it } from 'param.macro'
+    const add = (x, y) => x + y
+    const fn = it |> parseInt |> add(10, _) |> String
+  `,
+  `
+    const add = (x, y) => x + y;
+
+    const fn = _it => {
+      return _it |> parseInt |> ((_arg) => {
+        return add(10, _arg);
+      }) |> String;
+    };
+  `
+)
+
+test(
+  '_: includes tail paths in the wrapper function',
+  [babel7, babel6],
+  `
+    import { _ } from 'param.macro'
+    const fn = String(_).toUpperCase() === 2
+  `,
+  `
+    const fn = (_arg) => {
+      return String(_arg).toUpperCase() === 2;
+    };
+  `
+)
+
+test(
+  '_: handles hoisting correctly with tail paths',
+  [babel7, babel6],
+  `
+    import { _, it } from 'param.macro'
+    const Bar = class {}
+    const fn = foo(_, new Bar()).toUpperCase() === 2
+  `,
+  `
+    const Bar = class {};
+
+    const _ref = new Bar();
+
+    const fn = (_arg) => {
+      return foo(_arg, _ref).toUpperCase() === 2;
+    };
+  `
+)
+
+test(
+  '_: supports default parameters',
+  [babel7, babel6],
+  `
+    import { _ } from 'param.macro'
+    const fn = (a = _ + _) => {}
+  `,
+  `
+    const fn = (a = (_arg, _arg2) => {
+      return _arg + _arg2;
+    }) => {};
+  `
+)
+
+test(
+  '_: supports spread placeholders',
+  [babel7, babel6],
+  `
+    import { _ } from 'param.macro'
+    const log = console.log(..._)
+  `,
+  `
+    const log = (..._arg) => {
+      return console.log(..._arg);
+    };
+  `
+)
+
+// can't test this in Babel 6 because the pipeline operator is Babel 7 only
+test(
+  'both: interoperates with pipeline operator',
+  [babel7],
+  `
+    import { _, it } from 'param.macro'
+
+    const add = _ + _
+    const tenPlusString =
+      it
+      |> parseInt(_, 10)
+      |> add(10, _)
+      |> String
+
+    tenPlusString('10') |> console.log
+  `,
+  `
+    const add = (_arg, _arg2) => {
+      return _arg + _arg2;
+    };
+
+    const tenPlusString = _it => {
+      return _it |> ((_arg3) => {
+        return parseInt(_arg3, 10);
+      }) |> ((_arg4) => {
+        return add(10, _arg4);
+      }) |> String;
+    };
+
+    tenPlusString('10') |> console.log;
   `
 )
