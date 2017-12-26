@@ -1,7 +1,8 @@
 const { resolve } = require('path')
 const { Renderer } = require('marked')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
-module.exports = {
+module.exports = env => ({
   entry: './src/index.js',
   output: {
     path: resolve(__dirname),
@@ -37,5 +38,6 @@ module.exports = {
         }
       }]
     }]
-  }
-}
+  },
+  plugins: env && env.production ? [new UglifyJsPlugin()] : []
+})
