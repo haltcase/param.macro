@@ -85,11 +85,11 @@ module.exports = babel => {
         if (!isRequire(path)) return
 
         const imports = path.parent.id.name
-          ? [{localName: path.parent.id.name, importedName: 'default'}]
+          ? [{ localName: path.parent.id.name, importedName: 'default' }]
           : path.parent.id.properties.map(property => ({
-              localName: property.value.name,
-              importedName: property.key.name
-            }))
+            localName: property.value.name,
+            importedName: property.key.name
+          }))
 
         applyPlugin(babel, path, imports)
         path.parentPath.remove()
