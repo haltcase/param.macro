@@ -45,11 +45,12 @@
     "babel-plugin-macros": "^2.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.0.0-beta.32",
-    "@babel/core": "^7.0.0-beta.32",
-    "@babel/preset-env": "^7.0.0-beta.32",
-    "@babel/preset-stage-1": "^7.0.0-beta.32",
-    "ava": "^0.23.0",
+    "@babel/cli": "7.0.0-beta.36",
+    "@babel/core": "7.0.0-beta.36",
+    "@babel/preset-env": "7.0.0-beta.36",
+    "@babel/preset-stage-1": "7.0.0-beta.36",
+    "ava": "^0.24.0",
+    "babel-core": "^6.26.0",
     "dedent": "^0.7.0"
   }
 }
