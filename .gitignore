@@ -1,4 +1,8 @@
-# IDE configurations
+# lock files
+yarn.lock
+package-lock.json
+
+# ide configurations
 .c9
 .idea
 .vscode
