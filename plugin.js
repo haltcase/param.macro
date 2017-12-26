@@ -5,7 +5,7 @@ const transformPlaceholders = require('./dist/placeholders').default
 const { name } = require('./package.json')
 
 const isPrimitive = val =>
-  val == null || ['s', 'b', 'n'].indexOf((typeof val)[0]) > 0
+  val == null || ['s', 'b', 'n'].indexOf((typeof val)[0]) >= 0
 
 const looksLike = (a, b) =>
   a &&
