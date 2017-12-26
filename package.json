@@ -19,6 +19,7 @@
     "node": ">=6"
   },
   "keywords": [
+    "babel-plugin-macros",
     "babel-macros",
     "macro",
     "functional",
