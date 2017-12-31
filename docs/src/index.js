@@ -172,8 +172,8 @@ function loadEditors (state) {
   // set individual editor options
   compiled.setReadOnly(true)
 
-  editor.getSession().setUseSoftTabs(true)
-  editor.getSession().setTabSize(2)
+  editor.session.setUseSoftTabs(true)
+  editor.session.setTabSize(2)
 
   result.setShowPrintMargin(false)
   result.renderer.setShowGutter(false)
