@@ -163,6 +163,7 @@ function loadEditors (state) {
   for (const target of [editor, compiled, result]) {
     target.setTheme('ace/theme/tomorrow')
     target.session.setMode('ace/mode/javascript')
+    target.session.setUseWorker(false)
     target.setHighlightActiveLine(false)
     target.setHighlightGutterLine(false)
     target.$blockScrolling = Infinity
