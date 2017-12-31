@@ -310,14 +310,14 @@
     <div class="titlebar-left">editable JavaScript ...</div>
     <pre id="editor">import { _, it } from 'param.macro'
 
-const log = console.log(_)
+const log = console.log(..._)
 
 log([0, 1, 0, 1].filter(!!it))
 // -> [1, 1]
 
 const heroes = [
-  { name: 'bob', getPower () { return { level: 9001 } } },
-  { name: 'joe', getPower () { return { level: 4500 } } }
+  { name: 'bob', getPower: () => ({ level: 9001 }) },
+  { name: 'joe', getPower: () => ({ level: 4500 }) }
 ]
 
 log(heroes.find(it.getPower().level > 9000))
@@ -327,14 +327,13 @@ const greet = `Hello, ${_}!`
 
 log(greet('world'))
 // -> Hello, world!
-
 </pre>
   </div>
   <div id="output-wrapper" class="split split-horizontal">
     <div id="compiled-wrapper" class="split split-vertical">
       <div class="titlebar-right">... magically transformed</div>
-      <pre id="compiled">const log = _arg => {
-  return console.log(_arg)
+      <pre id="compiled">const log = (..._arg) => {
+  return console.log(..._arg)
 }
 
 log(
@@ -346,21 +345,15 @@ log(
 const heroes = [
   {
     name: 'bob',
-
-    getPower() {
-      return {
-        level: 9001
-      }
-    }
+    getPower: () => ({
+      level: 9001
+    })
   },
   {
     name: 'joe',
-
-    getPower() {
-      return {
-        level: 4500
-      }
-    }
+    getPower: () => ({
+      level: 4500
+    })
   }
 ]
 log(
@@ -374,7 +367,6 @@ const greet = _arg2 => {
 }
 
 log(greet('world')) // -> Hello, world!
-
 </pre>
     </div>
     <div id="console-wrapper" class="split split-vertical">
