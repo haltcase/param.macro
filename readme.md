@@ -276,7 +276,7 @@ There are two separate constructs provided by _param.macro_:
 * `_` &rarr; partial application symbol
 * `it` &rarr; implicit parameter symbol
 
-There are a couple of major difference between the two:
+There are a couple of major differences between the two:
 
 ### scoping
 
@@ -327,7 +327,7 @@ commonly used as the identifier for things like lodash's collection of utilities
 
 There are a few reasons this is totally fine.
 
-1. The plugin allows for [custom symbols][#set-custom-tokens]
+1. The plugin allows for [custom symbols](#set-custom-tokens)
 
     If you do happen to need `_` or `it` as identifiers, you're able to change
     the imported symbols (using standard aliased imports) to anything you want.
