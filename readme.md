@@ -1,6 +1,6 @@
 # param.macro &middot; [![Version](https://img.shields.io/npm/v/param.macro.svg?style=flat-square&maxAge=3600)](https://www.npmjs.com/package/param.macro) [![License](https://img.shields.io/npm/l/param.macro.svg?style=flat-square&maxAge=3600)](https://www.npmjs.com/package/param.macro) [![Travis CI](https://img.shields.io/travis/citycide/param.macro.svg?style=flat-square&maxAge=3600)](https://travis-ci.org/citycide/param.macro) [![JavaScript Standard Style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square&maxAge=3600)](https://standardjs.com)
 
-> Partial application syntax and lambda parameters for JavaScript, inspired by Scala's `_` & Kotlin's `it`.
+> Partial application syntax and lambda parameters for JavaScript, inspired by Scala's `_` & Kotlin's `it`. Read more about this macro in the intro blog post ["Partial Application & Lambda Parameter Syntax for JavaScript"](https://medium.com/@citycide/partial-application-lambda-parameters-for-js-aa16f4d94df4)
 
 > **try it live** on the **[online playground](https://citycide.github.io/param.macro)**
 
