@@ -12,13 +12,13 @@ import { Tour } from 'tether-shepherd'
 import plugin from '../../plugin'
 import readme from '../../readme.md'
 
-function getStorage (key) {
+const getStorage = key => {
   try {
     return window.localStorage.getItem(key) |> JSON.parse
   } catch {}
 }
 
-function setStorage (key, value) {
+const setStorage = (key, value) => {
   try {
     return window.localStorage.setItem(key, JSON.stringify(value))
   } catch {}
@@ -38,13 +38,13 @@ highlight.initHighlightingOnLoad()
 
 const codeBlocks = document.querySelectorAll('code.lang-js')
 
-function getQueryProp (name) {
+const getQueryProp = name => {
   const regex = new RegExp(`[?&]${name}=([^&]*)`)
   const hasMatch = regex.exec(window.location.search)
   return hasMatch && decodeURIComponent(hasMatch[1].replace(/\+/g, ' '))
 }
 
-function removeQueryProp (parameter) {
+const removeQueryProp = parameter => {
   const url = window.location.href
   const parts = url.split('?')
   if (parts.length < 2) return
@@ -61,7 +61,7 @@ function removeQueryProp (parameter) {
   return parts[0] + (props.length > 0 ? '?' + props.join('&') : '')
 }
 
-function setModalState (state) {
+const setModalState = state => {
   const isVisible = helpModal.style.visibility === 'visible'
 
   if (!!isVisible === !!state) return
@@ -82,7 +82,7 @@ function setModalState (state) {
   }
 }
 
-function setURL (url) {
+const setURL = url => {
   if (window.history.pushState) {
     window.history.pushState('', '', url)
   } else {
@@ -90,17 +90,13 @@ function setURL (url) {
   }
 }
 
-function checkQuery () {
-  return setModalState(!!getQueryProp('readme'))
-}
+const checkQuery = () =>
+  setModalState(!!getQueryProp('readme'))
 
-function checkScroll () {
-  if (helpModalBody.scrollTop >= 1000) {
-    topButton.style.bottom = '1rem'
-  } else {
-    topButton.style.bottom = '-3.5rem'
-  }
-}
+const checkScroll = () =>
+  helpModalBody.scrollTop >= 1000
+    ? topButton.style.bottom = '1rem'
+    : topButton.style.bottom = '-3.5rem'
 
 checkQuery()
 checkScroll()
@@ -112,7 +108,7 @@ topButton.addEventListener('click', () => helpModalBody.scrollTop = 0)
 helpButton.addEventListener('click', () => setModalState(true))
 closeButton.addEventListener('click', () => setModalState(false))
 
-function loadRunButtons (editor, compiled, result) {
+const loadRunButtons = (editor, compiled, result) => {
   helpModal.addEventListener('click', ({ target }) => {
     if (target.className !== 'send-to-editor') {
       if (target.parentElement.className === 'send-to-editor') {
@@ -152,7 +148,7 @@ split(['#compiled-wrapper', '#console-wrapper'], {
   sizes: [85, 15]
 })
 
-function loadEditors (state) {
+const loadEditors = state => {
   const [editor, compiled, result] = [
     ace.edit('editor'),
     ace.edit('compiled'),
@@ -286,7 +282,7 @@ const logLineReducer = (list, line, i, col) => {
   return `${list}${add ? ' ' : ''}${add}`.trim()
 }
 
-function logger ({ types: t }) {
+const logger = ({ types: t }) => {
   return {
     visitor: {
       Program (path) {
@@ -387,7 +383,7 @@ const formatCompiled = format(_, {
   semi: false
 })
 
-function handleCodeChange () {
+const handleCodeChange = () => {
   const source = editor.getValue()
 
   let initial
