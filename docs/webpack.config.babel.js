@@ -1,8 +1,9 @@
 const { resolve } = require('path')
-const { Renderer } = require('marked')
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+// const { Renderer } = require('marked')
+// const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 module.exports = env => ({
+  mode: 'development',
   entry: './src/index.js',
   output: {
     path: resolve(__dirname),
@@ -22,7 +23,9 @@ module.exports = env => ({
                 browsers: ['last 2 versions', '> 10%']
               }
             }],
-            '@babel/stage-0'
+            ['@babel/stage-0', {
+              decoratorsLegacy: true
+            }]
           ],
           plugins: ['babel-plugin-macros']
         }
@@ -32,12 +35,8 @@ module.exports = env => ({
       use: [{
         loader: 'html-loader'
       }, {
-        loader: 'markdown-loader',
-        options: {
-          renderer: new Renderer()
-        }
+        loader: 'markdown-loader'
       }]
     }]
-  },
-  plugins: env && env.production ? [new UglifyJsPlugin()] : []
+  }
 })
