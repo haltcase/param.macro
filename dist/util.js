@@ -14,7 +14,8 @@ exports.shouldHoist = shouldHoist;
 exports.wasMacro = wasMacro;
 exports.PartialError = void 0;
 const nonHoistTypes = ['Identifier', 'ArrayExpression', 'ObjectExpression', 'FunctionExpression', 'ArrowFunctionExpression'];
-let PartialError = class PartialError extends Error {
+
+class PartialError extends Error {
   constructor(message) {
     super(message);
     this.name = 'PartialError';
@@ -26,7 +27,8 @@ let PartialError = class PartialError extends Error {
     }
   }
 
-};
+}
+
 exports.PartialError = PartialError;
 
 function isPipeline(path, child) {

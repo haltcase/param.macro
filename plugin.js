@@ -2,6 +2,7 @@
 
 const transformImplicitParams = require('./dist/implicit-params').default
 const transformPlaceholders = require('./dist/placeholders').default
+const transformLift = require('./dist/lift').default
 const { name } = require('./package.json')
 
 const isPrimitive = val =>
@@ -62,6 +63,7 @@ const applyPlugin = (babel, path, imports) => {
   if (references.it) transformImplicitParams(babel.types, references.it)
   if (references.default) transformImplicitParams(babel.types, references.default)
   if (references._) transformPlaceholders(babel.types, references._)
+  if (references.lift) transformLift(babel.types, references.lift)
 }
 
 module.exports = babel => {
