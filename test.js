@@ -1,7 +1,7 @@
 import test from 'ava'
 
 import { exec } from 'child_process'
-import { EOL } from 'os'
+import { join } from 'path'
 
 import { transform as transform7 } from '@babel/core'
 import { transform as transform6 } from 'babel-core'
@@ -21,16 +21,22 @@ const getSyntaxPlugins = () => new Promise((resolve, reject) => {
     }
 
     resolve(
-      stdout.split(EOL)
-      .filter(path => path.includes('@babel/plugin-syntax-'))
-      .map(path => path.slice(path.indexOf('@babel')))
+      stdout.split('\n')
+      .filter(path =>
+        path.includes(join('@babel', 'plugin-syntax-'))
+      )
+      .map(path =>
+        path.includes(join('@babel', 'plugin-syntax-decorators'))
+          ? [path.slice(path.indexOf('@babel')), { legacy: true }]
+          : path.slice(path.indexOf('@babel'))
+      )
     )
   })
 })
 
 const syntaxPlugins = getSyntaxPlugins()
 
-const babel6 = (t, input, expected) => {
+const babel6 = (t, input, expected = ``) => {
   const normalizedInput = dedent(input)
   const output = transform6(normalizedInput, {
     babelrc: false,
@@ -43,7 +49,7 @@ const babel6 = (t, input, expected) => {
 
 babel6.title = name => `(babel 6) ${name}`
 
-const babel7 = async (t, input, expected) => {
+const babel7 = async (t, input, expected = ``) => {
   const normalizedInput = dedent(input)
   const output = transform7(normalizedInput, {
     babelrc: false,
@@ -411,5 +417,45 @@ test(
     };
 
     tenPlusString('10') |> console.log;
+  `
+)
+
+test(
+  'lift: allows for creating binary+ functions with placeholders',
+  [babel7, babel6],
+  `
+    import { _, lift } from 'param.macro'
+    ;[1, 2, 3, 4].reduce(lift(_ + _))
+  `,
+  `
+    [1, 2, 3, 4].reduce((_arg, _arg2) => {
+      return _arg + _arg2;
+    });
+  `
+)
+
+test(
+  'lift: `it` implicit parameters are functionally unaffected',
+  [babel7, babel6],
+  `
+    import { it, lift } from 'param.macro'
+    ;[1, 2, 3, 4].reduce(lift(it + it))
+  `,
+  `
+    [1, 2, 3, 4].reduce(_it => {
+      return _it + _it;
+    });
+  `
+)
+
+test(
+  'lift: is just elided in non-macro expressions',
+  [babel7, babel6],
+  `
+    import { lift } from 'param.macro'
+    console.log(lift(1 + 1))
+  `,
+  `
+    console.log(1 + 1);
   `
 )
