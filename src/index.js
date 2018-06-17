@@ -11,4 +11,4 @@ function transform ({ references, state, babel: { types: t } }) {
   if (references._) transformPlaceholders(t, references._)
 }
 
-module.exports = createMacro(transform)
+export default createMacro(transform)
