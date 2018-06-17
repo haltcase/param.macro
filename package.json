@@ -1,6 +1,6 @@
 {
   "name": "param.macro",
-  "version": "2.0.0",
+  "version": "2.1.0-beta.1",
   "description": "Partial application syntax and lambda parameters for JavaScript, inspired by Scala's `_` & Kotlin's `it`",
   "author": {
     "name": "Bo Lingen",
