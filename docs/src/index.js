@@ -162,6 +162,7 @@ window.addEventListener('hashchange', () => {
   if (hashCode) {
     editor.setValue(hashCode)
     editor.clearSelection()
+    handleCodeChange()
   }
 }, false)
 
@@ -197,6 +198,7 @@ const loadEditors = state => {
   if (hashCode) {
     editor.setValue(hashCode)
     editor.clearSelection()
+    setTimeout(() => handleCodeChange(), 10)
   } else if (state) {
     editor.setValue(state.editor)
     compiled.setValue(state.compiled)
