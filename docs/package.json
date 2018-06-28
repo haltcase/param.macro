@@ -52,9 +52,7 @@
     "babel-plugin-macros": "^2.2.0",
     "html-loader": "^0.5.5",
     "markdown-loader": "^2.0.2",
-    "marked": "^0.3.19",
-    "uglifyjs-webpack-plugin": "^1.2.5",
-    "webpack": "^4.6.0",
-    "webpack-cli": "^2.1.2"
+    "webpack": "^4.13.0",
+    "webpack-cli": "^3.0.8"
   }
 }

@@ -1,8 +1,6 @@
 const { resolve } = require('path')
-// const { Renderer } = require('marked')
-// const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
-module.exports = env => ({
+module.exports = (env, argv) => ({
   mode: 'development',
   entry: './src/index.js',
   output: {
