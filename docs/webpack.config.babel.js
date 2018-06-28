@@ -19,13 +19,15 @@ module.exports = (env, argv) => ({
             ['@babel/env', {
               targets: {
                 browsers: ['last 2 versions', '> 10%']
-              }
-            }],
-            ['@babel/stage-0', {
-              decoratorsLegacy: true
+              },
+              shippedProposals: true
             }]
           ],
-          plugins: ['babel-plugin-macros']
+          plugins: [
+            'babel-plugin-macros',
+            '@babel/proposal-optional-chaining',
+            '@babel/proposal-pipeline-operator'
+          ]
         }
       }
     }, {

@@ -36,7 +36,7 @@
     "watch": "webpack -w"
   },
   "dependencies": {
-    "@babel/standalone": "7.0.0-beta.46",
+    "@babel/standalone": "7.0.0-beta.51",
     "@citycide/prettier-babylon": "^1.4.7",
     "highlight.js": "^9.12.0",
     "lodash.debounce": "^4.0.8",
@@ -45,13 +45,15 @@
     "tether-shepherd": "^1.8.1"
   },
   "devDependencies": {
-    "@babel/core": "7.0.0-beta.46",
-    "@babel/preset-env": "7.0.0-beta.46",
-    "@babel/preset-stage-0": "7.0.0-beta.46",
-    "babel-loader": "^8.0.0-beta.0",
+    "@babel/core": "7.0.0-beta.51",
+    "@babel/preset-env": "7.0.0-beta.51",
+    "@babel/plugin-proposal-optional-chaining": "7.0.0-beta.51",
+    "@babel/plugin-proposal-pipeline-operator": "7.0.0-beta.51",
+    "babel-loader": "8.0.0-beta.4",
     "babel-plugin-macros": "^2.2.0",
     "html-loader": "^0.5.5",
-    "markdown-loader": "^2.0.2",
+    "lz-string": "^1.4.4",
+    "markdown-loader": "^3.0.0",
     "webpack": "^4.13.0",
     "webpack-cli": "^3.0.8"
   }

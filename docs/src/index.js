@@ -8,6 +8,7 @@ import debounce from 'lodash.debounce'
 import prettyFormat from 'pretty-format'
 import split from 'split.js'
 import { Tour } from 'tether-shepherd'
+import lz from 'lz-string'
 
 import plugin from '../../plugin'
 import readme from '../../readme.md'
@@ -36,7 +37,7 @@ helpModalBody.innerHTML = readme
 highlight.registerLanguage('javascript', javascript)
 highlight.initHighlightingOnLoad()
 
-const codeBlocks = document.querySelectorAll('code.lang-js')
+const codeBlocks = document.querySelectorAll('code.language-js')
 
 const getQueryProp = name => {
   const regex = new RegExp(`[?&]${name}=([^&]*)`)
@@ -148,6 +149,22 @@ split(['#compiled-wrapper', '#console-wrapper'], {
   sizes: [85, 15]
 })
 
+const getHashCode = hash =>
+  hash.startsWith('#code')
+    ? hash.slice(6) |> lz.decompressFromEncodedURIComponent
+    : ''
+
+const setHashCode = hash =>
+  location.hash = `code/${lz.compressToEncodedURIComponent(hash)}`
+
+window.addEventListener('hashchange', () => {
+  const hashCode = getHashCode(location.hash)
+  if (hashCode) {
+    editor.setValue(hashCode)
+    editor.clearSelection()
+  }
+}, false)
+
 const loadEditors = state => {
   const [editor, compiled, result] = [
     ace.edit('editor'),
@@ -175,7 +192,12 @@ const loadEditors = state => {
   result.renderer.setShowGutter(false)
   result.setReadOnly(true)
 
-  if (state) {
+  const hashCode = getHashCode(location.hash)
+
+  if (hashCode) {
+    editor.setValue(hashCode)
+    editor.clearSelection()
+  } else if (state) {
     editor.setValue(state.editor)
     compiled.setValue(state.compiled)
     result.setValue(state.result)
@@ -254,11 +276,27 @@ if (!getStorage('tourComplete')) {
       on: 'bottom'
     },
     buttons: [{
-      text: 'done',
+      text: 'next',
       action: () => {
         if (!isReadmeURL) closeButton.click()
-        return tour.complete()
+        return tour.next()
       }
+    }]
+  })
+
+  tour.addStep('shareable-links', {
+    title: 'sharable links are automatic',
+    text:
+      `This page's URL is automatically updated as you type, so if ` +
+      'you want to share this code, just copy from your address bar!',
+    attachTo: {
+      element: helpButton,
+      on: 'bottom'
+    },
+    buttons: [{
+      text: 'done',
+      action: () =>
+        tour.complete()
     }]
   })
 
@@ -313,7 +351,9 @@ const tryEval = debounce(input => {
   let runnable
   try {
     runnable = transform(input, {
-      presets: ['stage-0']
+      presets: [
+        ['stage-0', { decoratorsLegacy: true }]
+      ]
     }).code
   } catch (e) {
     console.error(e)
@@ -352,28 +392,29 @@ const tryEval = debounce(input => {
 }, 200)
 
 const persist = debounce(state => {
+  const code = editor.getValue()
+  setHashCode(code)
+
   return setStorage(
     'editorState',
     state || {
-      editor: editor.getValue(),
+      editor: code,
       compiled: compiled.getValue(),
       result: result.getValue()
     }
   )
 }, 1000)
 
-editor.getSession().on('change', debounce(handleCodeChange, 200))
-
 const syntaxPlugins = Object.keys(availablePlugins)
-  .filter(it.startsWith('syntax'))
+  .filter(it.startsWith('syntax') && it !== 'syntax-flow')
+  .map(it === 'syntax-decorators' ? [it, { legacy: true }] : it)
 
 const compilerPlugins = [...syntaxPlugins, plugin]
 
-const compileSource = source =>
-  transform(source, {
-    presets: [],
-    plugins: compilerPlugins
-  }).code
+const compileSource = transform(_, {
+  presets: [],
+  plugins: compilerPlugins
+}).code
 
 const formatCompiled = format(_, {
   printWidth: 50,
@@ -403,3 +444,5 @@ const handleCodeChange = () => {
   tryEval(initial)
   persist()
 }
+
+editor.getSession().on('change', debounce(handleCodeChange, 200))
