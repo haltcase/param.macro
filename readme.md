@@ -12,6 +12,7 @@
   * [argument placeholders](#argument-placeholders): `add(1, _)`
   * [in assignments](#_-and-it-in-assignments): `const areSameThing = _ === _`
   * [other expressions](#other-expressions): `it.getPower().level > 9000`, ``const greet = `Hello, ${_}!` ``
+  * [`lift` modifier](#lift-modifier): `;[1, 2].reudce(lift(_ = _))`
 * [usage](#usage)
   * [Babel v7](#babelrcjs-babel-v7)
   * [Babel v6](#babelrc-babel-v6)
@@ -28,7 +29,7 @@
 
 ## overview
 
-_param.macro_ provides two symbols &mdash; `it` and `_`.
+_param.macro_ provides two main symbols &mdash; `it` and `_`.
 
 `it` can be used in an expression passed to a function which implicitly creates
 a lambda function in place accepting a single argument.
@@ -227,6 +228,51 @@ tenPlusString('10') |> console.log
 // -> 20
 ```
 
+### `lift` modifier
+
+In addition to `_` and `it`, there is a third symbol exported by `param.macro`
+called **`lift`**. In most scenarios it is simply removed from the output but is
+very useful in combination with `_` placeholders.
+
+Because `it` creates only _unary_ functions in place and `_` always traverses
+_out_ of its nearest parent function call, `lift` serves as an operator that
+fills out the middle ground: using placeholders to create inline functions of
+any arity.
+
+With `_` alone, the following example will not do what you probably want:
+
+```js
+import { _ } from 'param.macro'
+
+const array = [1, 2, 3, 4, 5]
+const sum = array.reduce(_ + _)
+```
+
+Because it produces this:
+
+```js
+const array = [1, 2, 3, 4, 5]
+const sum = (_arg, _arg2) => {
+  return array.reduce(_arg + _arg2)
+}
+```
+
+To actually pass in an implicit binary function with `_` you can use the `lift`
+operator:
+
+```js
+import { _, lift } from 'param.macro'
+
+const array = [1, 2, 3, 4, 5]
+const sum = array.reduce(lift(_ + _))
+console.log(sum)
+// -> 15
+```
+
+It may be helpful to note that `_` is still following its own rules here: it
+traversed upward out of its parent function call! It just so happens that call
+is removed afterward leaving your new function exactly where you want it.
+
 ## usage
 
 ### .babelrc.js (Babel v7)
@@ -271,7 +317,7 @@ A standalone version is also provided for those not already using `babel-plugin-
 
 ## differences between `_` and `it`
 
-There are two separate constructs provided by _param.macro_:
+There are two main & distinct constructs provided by _param.macro_:
 
 * `_` &rarr; partial application symbol
 * `it` &rarr; implicit parameter symbol
