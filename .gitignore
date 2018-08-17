@@ -7,4 +7,5 @@ package-lock.json
 .idea
 .vscode
 
+docs/.cache
 node_modules
