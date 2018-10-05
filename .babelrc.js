@@ -6,6 +6,8 @@ module.exports = {
   plugins: [
     'babel-plugin-macros',
     '@babel/proposal-optional-chaining',
-    '@babel/proposal-pipeline-operator'
+    ['@babel/proposal-pipeline-operator', {
+      proposal: 'minimal'
+    }]
   ]
 }

@@ -1,8 +1,5 @@
 import test from 'ava'
 
-import { exec } from 'child_process'
-import { join } from 'path'
-
 import { transform as transform7 } from '@babel/core'
 import { transform as transform6 } from 'babel-core'
 import macros from 'babel-plugin-macros'
@@ -14,27 +11,11 @@ const blankLines = /(^[ \t]*\n)/gm
 // using this ensures the output is the same between the two
 const stripBlankLines = code => code.replace(blankLines, '')
 
-const getSyntaxPlugins = () => new Promise((resolve, reject) => {
-  exec('npm ls --parseable', (err, stdout, stderr) => {
-    if (err && !err.message.includes('extraneous')) {
-      return reject(err)
-    }
-
-    resolve(
-      stdout.split('\n')
-      .filter(path =>
-        path.includes(join('@babel', 'plugin-syntax-'))
-      )
-      .map(path =>
-        path.includes(join('@babel', 'plugin-syntax-decorators'))
-          ? [path.slice(path.indexOf('@babel')), { legacy: true }]
-          : path.slice(path.indexOf('@babel'))
-      )
-    )
-  })
-})
-
-const syntaxPlugins = getSyntaxPlugins()
+const syntaxPlugins = [
+  ['@babel/plugin-syntax-pipeline-operator', {
+    proposal: 'minimal'
+  }]
+]
 
 const babel6 = (t, input, expected = ``) => {
   const normalizedInput = dedent(input)
@@ -53,7 +34,7 @@ const babel7 = async (t, input, expected = ``) => {
   const normalizedInput = dedent(input)
   const output = transform7(normalizedInput, {
     babelrc: false,
-    plugins: [...await syntaxPlugins, macros],
+    plugins: [...syntaxPlugins, macros],
     filename: __filename
   }).code.trim()
 
