@@ -451,9 +451,8 @@ was provided.
 1. Clone the repo: `git clone https://github.com/citycide/param.macro.git`
 2. Move into the new directory: `cd param.macro`
 3. Install dependencies: `npm install`
-4. Link the project to itself: `npm link && npm link param.macro`
-5. Build the source: `npm run build`
-6. Run tests: `npm test`
+4. Build the source: `npm run build`
+5. Run tests: `npm test`
 
 > this project uses itself in its source, so take note of the `npm link`
 step since it's necessary to build or test
