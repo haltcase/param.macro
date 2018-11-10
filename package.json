@@ -37,8 +37,9 @@
     "plugin.js"
   ],
   "scripts": {
+    "pretest": "npm-self-link && npm run build",
     "build": "babel src -d dist",
-    "test": "npm run build && ava",
+    "test": "ava",
     "prepublishOnly": "npm test"
   },
   "dependencies": {
@@ -47,11 +48,12 @@
   "devDependencies": {
     "@babel/cli": "^7.1.5",
     "@babel/core": "^7.1.6",
-    "@babel/preset-env": "^7.1.6",
     "@babel/plugin-proposal-optional-chaining": "^7.0.0",
     "@babel/plugin-proposal-pipeline-operator": "^7.0.0",
+    "@babel/preset-env": "^7.1.6",
     "ava": "1.0.0-rc.2",
     "babel-core": "^6.26.3",
-    "dedent": "^0.7.0"
+    "dedent": "^0.7.0",
+    "npm-self-link": "^1.1.5"
   }
 }
