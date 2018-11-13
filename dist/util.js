@@ -60,12 +60,11 @@ function findTargetAssignment(path) {
   let calls = 0;
   return _ref = (_path = path, findTopmostLink(_path)), ((_arg) => {
     return findParentUntil(_arg, (parent, link) => {
-      if (isPipeline(parent, link)) return false;
       if (parent.isCallExpression() && ++calls > 0) return false; // parent.isObjectProperty() -> parent.get('value')
 
       if (parent.isVariableDeclarator()) {
         return parent.get('init');
-      } else if (parent.isAssignmentPattern()) {
+      } else if (parent.isAssignmentPattern() || isPipeline(parent, link)) {
         return parent.get('right');
       }
     });

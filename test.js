@@ -402,6 +402,44 @@ test(
 )
 
 test(
+  'both: interoperates with pipeline operator part 2',
+  [babel7],
+  `
+    import { _, it } from 'param.macro'
+
+    const heroes = [
+      { name: 'bob' },
+      { name: 'joe' },
+      { name: 'ann' }
+    ]
+
+    heroes.map(it.name)
+    |> _[0].split('')
+    |> it.join(', ')
+    |> \`-- \${_} --\`
+    |> console.log
+  `,
+  `
+    const heroes = [{
+      name: 'bob'
+    }, {
+      name: 'joe'
+    }, {
+      name: 'ann'
+    }];
+    heroes.map(_it => {
+      return _it.name;
+    }) |> ((_arg) => {
+      return _arg[0].split('');
+    }) |> (_it2 => {
+      return _it2.join(', ');
+    }) |> ((_arg2) => {
+      return \`-- \${_arg2} --\`;
+    }) |> console.log;
+  `
+)
+
+test(
   'lift: allows for creating binary+ functions with placeholders',
   [babel7, babel6],
   `

@@ -45,13 +45,12 @@ export function findParentUntil (path, pred, accumulate) {
 export function findTargetAssignment (path) {
   let calls = 0
   return path |> findTopmostLink |> findParentUntil(_, (parent, link) => {
-    if (isPipeline(parent, link)) return false
     if (parent.isCallExpression() && ++calls > 0) return false
 
     // parent.isObjectProperty() -> parent.get('value')
     if (parent.isVariableDeclarator()) {
       return parent.get('init')
-    } else if (parent.isAssignmentPattern()) {
+    } else if (parent.isAssignmentPattern() || isPipeline(parent, link)) {
       return parent.get('right')
     }
   })
