@@ -160,8 +160,10 @@ const setHashCode = hash =>
 window.addEventListener('hashchange', () => {
   const hashCode = getHashCode(location.hash)
   if (hashCode) {
+    const pos = editor.getSelection().getCursor()
     editor.setValue(hashCode)
     editor.clearSelection()
+    editor.moveCursorToPosition(pos)
     handleCodeChange()
   }
 }, false)
@@ -427,6 +429,7 @@ const formatCompiled = format(_, {
 })
 
 const handleCodeChange = () => {
+  const pos = editor.getSelection().getCursor()
   const source = editor.getValue()
 
   let initial
@@ -445,6 +448,7 @@ const handleCodeChange = () => {
   compiled.clearSelection()
   tryEval(initial)
   persist()
+  editor.moveCursorToPosition(pos)
 }
 
 editor.getSession().on('change', debounce(handleCodeChange, 200))
