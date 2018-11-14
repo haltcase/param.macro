@@ -174,7 +174,7 @@ object like this:
 ```js
 import { _ } from 'param.macro'
 
-const hasOwn = _.hasOwnProperty(_)
+const hasOwn = it.hasOwnProperty(_)
 const object = { flammable: true }
 
 hasOwn(object, 'flammable')
@@ -344,6 +344,30 @@ const array = [1, 2, 3]
 _arg => array.map(_arg)
 array.map(_it => _it)
 ```
+
+An exception to these scoping differences is at the top-level, like the right-hand
+side of an assignment. `it` and `_` behave similarly here since there's no further
+upward to go, so they'll both happen to target the same place.
+
+For example the following two map implementations do the same thing:
+
+```js
+import { _, it } from 'param.macro'
+
+const map1 = _.map(_)
+const map2 = it.map(_)
+```
+
+_However_, if nested deeper inside a function call the object placeholder `_` in
+`map1` above would traverse further upward than an `it` would, and create a separate
+function _first_, before the argument placeholder `_` inside the method call itself.
+This creates an unary method call instead of the implicit binary function we probably
+wanted, `lift` or not.
+
+The `it` implementation in `map2` above _does_ still create the implicit binary
+function, even if nested deeper. And following the normal placeholder rules, any `_`
+inside the method call will traverse up to the method call and stop to create a
+function there, as we wanted.
 
 ### argument reuse
 
