@@ -345,7 +345,9 @@ _arg => array.map(_arg)
 array.map(_it => _it)
 ```
 
-Likewise, only at the top-level and as the right-hand side of an assignment does `it` and `_` behave similarly when used to produce implicit n-ary functions — since there's no further upward to go they can both stop at the same place.
+An exception to these scoping differences is at the top-level, like the right-hand
+side of an assignment. `it` and `_` behave similarly here since there's no further
+upward to go, so they'll both happen to target the same place.
 
 The following two map implementations do the same thing:
 
