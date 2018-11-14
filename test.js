@@ -2,6 +2,7 @@ import test from 'ava'
 
 import { transform as transform7 } from '@babel/core'
 import { transform as transform6 } from 'babel-core'
+import { runInNewContext } from 'vm'
 import macros from 'babel-plugin-macros'
 import dedent from 'dedent'
 
@@ -17,12 +18,26 @@ const syntaxPlugins = [
   }]
 ]
 
+const isRunnable = code => code.startsWith(`'test'`)
+
+const evalPlugin = ({ types: t }) => ({
+  visitor: {
+    Program (path) {
+      const directive = path.get('directives.0')
+      if (directive && directive.node.value.value === 'test') {
+        directive.remove()
+      }
+    }
+  }
+})
+
 const babel6 = (t, input, expected = ``) => {
   const normalizedInput = dedent(input)
   const output = transform6(normalizedInput, {
     babelrc: false,
-    plugins: [macros],
-    filename: __filename
+    plugins: [macros, evalPlugin],
+    filename: __filename,
+    comments: false
   }).code.trim()
 
   t.is(stripBlankLines(output), stripBlankLines(dedent(expected)))
@@ -32,11 +47,16 @@ babel6.title = name => `(babel 6) ${name}`
 
 const babel7 = async (t, input, expected = ``) => {
   const normalizedInput = dedent(input)
+
   const output = transform7(normalizedInput, {
     babelrc: false,
-    plugins: [...syntaxPlugins, macros],
+    plugins: [...syntaxPlugins, macros, evalPlugin],
     filename: __filename
   }).code.trim()
+
+  if (isRunnable(normalizedInput)) {
+    runInNewContext(output, { t })
+  }
 
   t.is(stripBlankLines(output), stripBlankLines(dedent(expected)))
 }
@@ -68,13 +88,18 @@ test(
   'it: aliased named import works',
   [babel7, babel6],
   `
+    'test'
     import { it as IT } from 'param.macro'
-    array.map(IT + ' sheckles')
+    const array = ['1', '2', '3']
+    const result = array.map(IT + ' sheckles')
+    t.deepEqual(result, ['1 sheckles', '2 sheckles', '3 sheckles'])
   `,
   `
-    array.map(_it => {
+    const array = ['1', '2', '3'];
+    const result = array.map(_it => {
       return _it + ' sheckles';
     });
+    t.deepEqual(result, ['1 sheckles', '2 sheckles', '3 sheckles']);
   `
 )
 
@@ -191,13 +216,16 @@ test(
   '_: aliased named import works',
   [babel7, babel6],
   `
+    'test'
     import { _ as PLACEHOLDER } from 'param.macro'
     const toInt = parseInt(PLACEHOLDER, 10)
+    t.is(toInt('2'), 2)
   `,
   `
     const toInt = (_arg) => {
       return parseInt(_arg, 10);
     };
+    t.is(toInt('2'), 2);
   `
 )
 
@@ -483,13 +511,16 @@ test(
   'lift: allows for creating binary+ functions with placeholders',
   [babel7, babel6],
   `
+    'test'
     import { _, lift } from 'param.macro'
-    ;[1, 2, 3, 4].reduce(lift(_ + _))
+    const result = [1, 2, 3, 4].reduce(lift(_ + _))
+    t.is(result, 10)
   `,
   `
-    [1, 2, 3, 4].reduce((_arg, _arg2) => {
+    const result = [1, 2, 3, 4].reduce((_arg, _arg2) => {
       return _arg + _arg2;
     });
+    t.is(result, 10);
   `
 )
 
@@ -511,10 +542,11 @@ test(
   'lift: is just elided in non-macro expressions',
   [babel7, babel6],
   `
+    'test'
     import { lift } from 'param.macro'
-    console.log(lift(1 + 1))
+    t.is(lift(1 + 1), 2)
   `,
   `
-    console.log(1 + 1);
+    t.is(1 + 1, 2);
   `
 )
