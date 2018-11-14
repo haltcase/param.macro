@@ -412,6 +412,7 @@ const persist = debounce(state => {
 const syntaxPlugins = Object.keys(availablePlugins)
   .filter(it.startsWith('syntax') && it !== 'syntax-flow')
   .map(it === 'syntax-decorators' ? [it, { legacy: true }] : it)
+  .map(it === 'syntax-pipeline-operator' ? [it, { proposal: 'minimal' }] : it)
 
 const compilerPlugins = [...syntaxPlugins, plugin]
 
