@@ -42,12 +42,15 @@ export function findParentUntil (path, pred, accumulate) {
   return accumulate ? link : null
 }
 
-export function findTargetAssignment (path) {
+export function findTargetAssignment (path, isImplicitParam = false) {
   let calls = 0
   return path |> findTopmostLink |> findParentUntil(_, (parent, link) => {
     if (parent.isCallExpression() && ++calls > 0) return false
 
-    // parent.isObjectProperty() -> parent.get('value')
+    if (isImplicitParam && link.listKey === 'expressions') {
+      return link
+    }
+
     if (parent.isVariableDeclarator()) {
       return parent.get('init')
     } else if (parent.isAssignmentPattern() || isPipeline(parent, link)) {

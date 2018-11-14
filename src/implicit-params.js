@@ -7,7 +7,7 @@ import {
 export default function transformImplicitParams (t, refs) {
   refs.forEach(referencePath => {
     const parent =
-      findTargetAssignment(referencePath) ||
+      findTargetAssignment(referencePath, true) ||
       findTargetCallee(referencePath)
 
     if (!parent) {

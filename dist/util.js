@@ -54,13 +54,17 @@ function findParentUntil(path, pred, accumulate) {
   return accumulate ? link : null;
 }
 
-function findTargetAssignment(path) {
+function findTargetAssignment(path, isImplicitParam = false) {
   var _ref, _path;
 
   let calls = 0;
   return _ref = (_path = path, findTopmostLink(_path)), ((_arg) => {
     return findParentUntil(_arg, (parent, link) => {
-      if (parent.isCallExpression() && ++calls > 0) return false; // parent.isObjectProperty() -> parent.get('value')
+      if (parent.isCallExpression() && ++calls > 0) return false;
+
+      if (isImplicitParam && link.listKey === 'expressions') {
+        return link;
+      }
 
       if (parent.isVariableDeclarator()) {
         return parent.get('init');
