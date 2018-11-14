@@ -364,7 +364,10 @@ function _first_, before the argument placeholder `_` inside the method call its
 This creates an unary method call instead of the implicit binary function we probably
 wanted, `lift` or not.
 
-The `it` implementation _does_ still create the implicit binary function, even if nested deeper. And following their own rules any `_` inside the method call will traverse up to the method call and stop to create a function there, as we wanted.
+The `it` implementation in `map2` above _does_ still create the implicit binary
+function, even if nested deeper. And following the normal placeholder rules, any `_`
+inside the method call will traverse up to the method call and stop to create a
+function there, as we wanted.
 
 ### argument reuse
 
