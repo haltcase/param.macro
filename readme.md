@@ -174,7 +174,7 @@ object like this:
 ```js
 import { _ } from 'param.macro'
 
-const hasOwn = _.hasOwnProperty(_)
+const hasOwn = it.hasOwnProperty(_)
 const object = { flammable: true }
 
 hasOwn(object, 'flammable')
@@ -344,6 +344,21 @@ const array = [1, 2, 3]
 _arg => array.map(_arg)
 array.map(_it => _it)
 ```
+
+Likewise, only at the top-level and as the right-hand side of an assignment does `it` and `_` behave similarly when used to produce implicit n-ary functions — since there's no further upward to go they can both stop at the same place.
+
+The following two map implementations do the same thing:
+
+```js
+import { _, it } from 'param.macro'
+
+const map1 = _.map(_)
+const map2 = it.map(_)
+```
+
+_However_, if nested deeper inside a function call, the object placeholder `_` would traverse upward and create a separate function _first_, before being passed the `_` inside the method call itself. This creates a unary method call instead of the implicit binary function we wanted, lift or not.
+
+The `it` implementation _does_ still create the implicit binary function, even if nested deeper. And following their own rules any `_` inside the method call will traverse up to the method call and stop to create a function there, as we wanted.
 
 ### argument reuse
 
