@@ -349,7 +349,7 @@ An exception to these scoping differences is at the top-level, like the right-ha
 side of an assignment. `it` and `_` behave similarly here since there's no further
 upward to go, so they'll both happen to target the same place.
 
-The following two map implementations do the same thing:
+For example the following two map implementations do the same thing:
 
 ```js
 import { _, it } from 'param.macro'
