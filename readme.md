@@ -358,7 +358,11 @@ const map1 = _.map(_)
 const map2 = it.map(_)
 ```
 
-_However_, if nested deeper inside a function call, the object placeholder `_` would traverse upward and create a separate function _first_, before being passed the `_` inside the method call itself. This creates a unary method call instead of the implicit binary function we wanted, lift or not.
+_However_, if nested deeper inside a function call the object placeholder `_` in
+`map1` above would traverse further upward than an `it` would, and create a separate
+function _first_, before the argument placeholder `_` inside the method call itself.
+This creates an unary method call instead of the implicit binary function we probably
+wanted, `lift` or not.
 
 The `it` implementation _does_ still create the implicit binary function, even if nested deeper. And following their own rules any `_` inside the method call will traverse up to the method call and stop to create a function there, as we wanted.
 
