@@ -368,6 +368,46 @@ test(
   `
 )
 
+test(
+  '_: works normally within template expressions',
+  [babel7, babel6],
+  `
+    import { _ } from 'param.macro'
+    const a = style\`
+      font-size: 16px;
+      color: \${_.color};
+    \`
+  `,
+  `
+  const a = (_arg) => {
+    return style\`
+    font-size: 16px;
+    color: \${_arg.color};
+  \`;
+  };
+  `
+)
+
+test(
+  'it: is transformed in place within a template expression',
+  [babel7, babel6],
+  `
+    import it from 'param.macro'
+    const a = style\`
+      font-size: 16px;
+      color: \${it.color};
+    \`
+  `,
+  `
+  const a = style\`
+    font-size: 16px;
+    color: \${_it => {
+    return _it.color;
+  }};
+  \`;
+  `
+)
+
 // can't test this in Babel 6 because the pipeline operator is Babel 7 only
 test(
   'both: interoperates with pipeline operator',
