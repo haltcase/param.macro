@@ -308,7 +308,7 @@
 <div id="code-container">
   <div id="editor-wrapper" class="split split-horizontal">
     <div class="titlebar-left">editable JavaScript ...</div>
-    <pre id="editor">import { _, it } from 'param.macro'
+    <pre id="editor">import { _, it, lift } from 'param.macro'
 
 const log = console.log(..._)
 
@@ -325,8 +325,8 @@ log(heroes.find(it.getPower().level > 9000))
 
 const greet = `Hello, ${_}!`
 
-log(greet('world'))
-// -> Hello, world!
+greet('world') |> it.toUpperCase() |> log
+// -> HELLO, WORLD!
 </pre>
   </div>
   <div id="output-wrapper" class="split split-horizontal">
@@ -366,13 +366,17 @@ const greet = _arg2 => {
   return `Hello, ${_arg2}!`
 }
 
-log(greet('world')) // -> Hello, world!
+greet('world') |>
+  (_it3 => {
+    return _it3.toUpperCase()
+  }) |>
+  log // -> HELLO, WORLD!
 </pre>
     </div>
     <div id="console-wrapper" class="split split-vertical">
       <pre id="console">Array [ 1 1 ]
 Object { "getPower": [Function getPower] "name": "bob" }
-"Hello, world!"</pre>
+"HELLO, WORLD!"</pre>
     </div>
   </div>
 </div>
