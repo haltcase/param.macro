@@ -37,8 +37,9 @@
     "plugin.js"
   ],
   "scripts": {
-    "pretest": "npm-self-link && npm run build",
+    "prebuild": "npm-self-link",
     "build": "babel src -d dist",
+    "pretest": "npm run build",
     "test": "ava",
     "prepublishOnly": "npm test"
   },
