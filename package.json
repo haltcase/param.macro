@@ -55,6 +55,6 @@
     "ava": "1.0.0-rc.2",
     "babel-core": "^6.26.3",
     "dedent": "^0.7.0",
-    "npm-self-link": "^1.1.6"
+    "npm-self-link": "^1.1.7"
   }
 }
