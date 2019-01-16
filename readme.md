@@ -454,8 +454,8 @@ was provided.
 4. Build the source: `npm run build`
 5. Run tests: `npm test`
 
-> this project uses itself in its source, so take note of the `npm link`
-step since it's necessary to build or test
+> this project uses itself in its source &mdash; see the [`npm-self-link`][self-link]
+readme for more about 'bootstrapping' and how it handles that build step for us
 
 ## contributing
 
@@ -483,3 +483,4 @@ MIT © [Bo Lingen / citycide](https://github.com/citycide)
 [ramda]: http://ramdajs.com/
 [scala-lambda]: https://github.com/xtuc/babel-plugin-transform-scala-lambda
 [bppa]: https://github.com/citycide/babel-plugin-partial-application
+[self-link]: https://github.com/Andarist/npm-self-link
