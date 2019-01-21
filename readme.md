@@ -172,7 +172,7 @@ We could implement a `hasOwn()` function to check if a property exists on an
 object like this:
 
 ```js
-import { _ } from 'param.macro'
+import { it, _ } from 'param.macro'
 
 const hasOwn = it.hasOwnProperty(_)
 const object = { flammable: true }
