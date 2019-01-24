@@ -2,17 +2,10 @@
   "name": "param.macro",
   "version": "3.0.0",
   "description": "Partial application syntax and lambda parameters for JavaScript, inspired by Scala's `_` & Kotlin's `it`",
-  "author": {
-    "name": "Bo Lingen",
-    "email": "lingenbw@gmail.com",
-    "url": "https://github.com/citycide"
-  },
+  "author": "Bo Lingen <lingenbw@gmail.com> (https://github.com/citycide)",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/citycide/param.macro.git"
-  },
-  "homepage": "https://github.com/citycide/param.macro",
+  "repository": "https://github.com/citycide/param.macro",
+  "homepage": "https://github.com/citycide/param.macro/tree/master/docs",
   "bugs": "https://github.com/citycide/param.macro/issues",
   "main": "./dist/index.js",
   "engines": {
