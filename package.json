@@ -37,15 +37,15 @@
     "prepublishOnly": "npm test"
   },
   "dependencies": {
-    "babel-plugin-macros": "^2.4.2"
+    "babel-plugin-macros": "^2.4.5"
   },
   "devDependencies": {
-    "@babel/cli": "^7.1.5",
-    "@babel/core": "^7.1.6",
-    "@babel/plugin-proposal-optional-chaining": "^7.0.0",
-    "@babel/plugin-proposal-pipeline-operator": "^7.0.0",
-    "@babel/preset-env": "^7.1.6",
-    "ava": "1.0.0-rc.2",
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.2.2",
+    "@babel/plugin-proposal-optional-chaining": "^7.2.0",
+    "@babel/plugin-proposal-pipeline-operator": "^7.3.0",
+    "@babel/preset-env": "^7.3.1",
+    "ava": "^1.1.0",
     "babel-core": "^6.26.3",
     "dedent": "^0.7.0",
     "npm-self-link": "^1.1.7"
