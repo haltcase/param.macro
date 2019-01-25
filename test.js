@@ -676,3 +676,25 @@ test(
     t.is(result, 'WORLD');
   `
 )
+
+test(
+  '_, it: assignment expressions are applied similarly to declarations',
+  [babel7, babel6],
+  `
+    import { _, it } from 'param.macro'
+    const bar = {}
+    bar.greet = \`Hello \${_}\`
+    const result = bar.greet('world')
+    t.is(result, 'Hello world')
+  `,
+  `
+    const bar = {};
+
+    bar.greet = (_arg) => {
+      return \`Hello \${_arg}\`;
+    };
+
+    const result = bar.greet('world');
+    t.is(result, 'Hello world');
+  `
+)
