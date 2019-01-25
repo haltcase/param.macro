@@ -1,5 +1,7 @@
 import test from 'ava'
 
+import { _ } from 'param.macro'
+
 import { transform as transform7 } from '@babel/core'
 import { transform as transform6 } from 'babel-core'
 import { runInNewContext } from 'vm'
@@ -11,7 +13,7 @@ const blankLines = /(^[ \t]*\n)/gm
 
 // Babel 6 & Babel 7 have different line breaks in output code
 // using this ensures the output is the same between the two
-const stripBlankLines = code => code.replace(blankLines, '')
+const stripBlankLines = _.replace(blankLines, '')
 
 const syntaxPlugins = [
   ['@babel/plugin-syntax-pipeline-operator', {
@@ -19,9 +21,15 @@ const syntaxPlugins = [
   }]
 ]
 
-const isRunnable = code => code.startsWith(`'test'`)
+const transformPlugins = [
+  ['@babel/plugin-proposal-pipeline-operator', {
+    proposal: 'minimal'
+  }]
+]
 
-const evalPlugin = ({ types: t }) => ({
+const isRunnable = _.startsWith(`'test'`)
+
+const evalPlugin = () => ({
   visitor: {
     Program (path) {
       const directive = path.get('directives.0')
@@ -75,15 +83,17 @@ const rewriteImportPlugin = () => {
 }
 
 const babel6 = (t, input, expected = ``) => {
-  const normalizedInput = dedent(input)
-  const output = transform6(normalizedInput, {
+  const output = input |> dedent |> transform6(_, {
     babelrc: false,
     plugins: [rewriteImportPlugin, macros, evalPlugin],
     filename: __filename,
     comments: false
   }).code.trim()
 
-  t.is(stripBlankLines(output), stripBlankLines(dedent(expected)))
+  t.is(
+    output |> stripBlankLines,
+    expected |> dedent |> stripBlankLines
+  )
 }
 
 babel6.title = name => `(babel 6) ${name}`
@@ -98,10 +108,17 @@ const babel7 = async (t, input, expected = ``) => {
   }).code.trim()
 
   if (isRunnable(normalizedInput)) {
-    runInNewContext(output, { t })
+    transform7(normalizedInput, {
+      babelrc: false,
+      plugins: [rewriteImportPlugin, macros, evalPlugin, ...transformPlugins],
+      filename: __filename
+    }).code |> runInNewContext(_, { t })
   }
 
-  t.is(stripBlankLines(output), stripBlankLines(dedent(expected)))
+  t.is(
+    output |> stripBlankLines,
+    expected |> dedent |> stripBlankLines
+  )
 }
 
 babel7.title = name => `(babel 7) ${name}`
@@ -125,13 +142,16 @@ test(
   'it: default import is the same as `it` named import',
   [babel7, babel6],
   `
+    'test'
     import it from 'param.macro'
     const identity = it
+    t.is(identity('hello'), 'hello')
   `,
   `
     const identity = _it => {
       return _it;
     };
+    t.is(identity('hello'), 'hello');
   `
 )
 
@@ -158,13 +178,16 @@ test(
   'it: transforms `it` arguments to lambda parameters',
   [babel7, babel6],
   `
+    'test'
     import { it } from 'param.macro'
     const arr = [1, 2, 3].map(it * 2)
+    t.deepEqual(arr, [2, 4, 6])
   `,
   `
     const arr = [1, 2, 3].map(_it => {
       return _it * 2;
     });
+    t.deepEqual(arr, [2, 4, 6]);
   `
 )
 
@@ -190,13 +213,16 @@ test(
   'it: lone `it` results in the identity function',
   [babel7, babel6],
   `
+    'test'
     import { it } from 'param.macro'
     const arr = [1, 2, 3].map(it)
+    t.deepEqual(arr, [1, 2, 3])
   `,
   `
     const arr = [1, 2, 3].map(_it => {
       return _it;
     });
+    t.deepEqual(arr, [1, 2, 3]);
   `
 )
 
@@ -253,13 +279,18 @@ test(
   '_: partially applies the called function',
   [babel7, babel6],
   `
+    'test'
     import { _ } from 'param.macro'
-    const log = console.log(_)
+    const add = (x, y) => x + y
+    const addOne = add(1, _)
+    t.is(addOne(4), 5)
   `,
   `
-    const log = (_arg) => {
-      return console.log(_arg);
+    const add = (x, y) => x + y;
+    const addOne = (_arg) => {
+      return add(1, _arg);
     };
+    t.is(addOne(4), 5);
   `
 )
 
@@ -371,9 +402,11 @@ test(
   '_: does not traverse out of pipelined expressions',
   [babel7],
   `
+    'test'
     import { _, it } from 'param.macro'
     const add = (x, y) => x + y
     const fn = it |> parseInt |> add(10, _) |> String
+    t.is(fn('100'), '110')
   `,
   `
     const add = (x, y) => x + y;
@@ -383,6 +416,7 @@ test(
         return add(10, _arg);
       }) |> String;
     };
+    t.is(fn('100'), '110');
   `
 )
 
@@ -423,13 +457,16 @@ test(
   '_: supports default parameters',
   [babel7, babel6],
   `
+    'test'
     import { _ } from 'param.macro'
-    const fn = (a = _ + _) => {}
+    const fn = (a = _ + _) => a(2, 2)
+    t.is(fn(), 4)
   `,
   `
     const fn = (a = (_arg, _arg2) => {
       return _arg + _arg2;
-    }) => {};
+    }) => a(2, 2);
+    t.is(fn(), 4);
   `
 )
 
@@ -458,12 +495,12 @@ test(
     \`
   `,
   `
-  const a = (_arg) => {
-    return style\`
-    font-size: 16px;
-    color: \${_arg.color};
-  \`;
-  };
+    const a = (_arg) => {
+      return style\`
+      font-size: 16px;
+      color: \${_arg.color};
+    \`;
+    };
   `
 )
 
@@ -478,12 +515,12 @@ test(
     \`
   `,
   `
-  const a = style\`
-    font-size: 16px;
-    color: \${_it => {
-    return _it.color;
-  }};
-  \`;
+    const a = style\`
+      font-size: 16px;
+      color: \${_it => {
+      return _it.color;
+    }};
+    \`;
   `
 )
 
@@ -492,6 +529,7 @@ test(
   'both: interoperates with pipeline operator',
   [babel7],
   `
+    'test'
     import { _, it } from 'param.macro'
 
     const add = _ + _
@@ -501,7 +539,7 @@ test(
       |> add(10, _)
       |> String
 
-    tenPlusString('10') |> console.log
+    tenPlusString('10') |> t.is(_, '20')
   `,
   `
     const add = (_arg, _arg2) => {
@@ -516,7 +554,9 @@ test(
       }) |> String;
     };
 
-    tenPlusString('10') |> console.log;
+    tenPlusString('10') |> ((_arg5) => {
+      return t.is(_arg5, '20');
+    });
   `
 )
 
@@ -524,6 +564,7 @@ test(
   'both: interoperates with pipeline operator part 2',
   [babel7],
   `
+    'test'
     import { _, it } from 'param.macro'
 
     const heroes = [
@@ -536,7 +577,7 @@ test(
     |> _[0].split('')
     |> it.join(', ')
     |> \`-- \${_} --\`
-    |> console.log
+    |> t.is(_, '-- b, o, b --')
   `,
   `
     const heroes = [{
@@ -554,7 +595,9 @@ test(
       return _it2.join(', ');
     }) |> ((_arg2) => {
       return \`-- \${_arg2} --\`;
-    }) |> console.log;
+    }) |> ((_arg3) => {
+      return t.is(_arg3, '-- b, o, b --');
+    });
   `
 )
 
@@ -579,13 +622,16 @@ test(
   'lift: `it` implicit parameters are functionally unaffected',
   [babel7, babel6],
   `
+    'test'
     import { it, lift } from 'param.macro'
-    ;[1, 2, 3, 4].reduce(lift(it + it))
+    const result = [1, 2, 3, 4].reduce(lift(it + it))
+    t.is(result, 8)
   `,
   `
-    [1, 2, 3, 4].reduce(_it => {
+    const result = [1, 2, 3, 4].reduce(_it => {
       return _it + _it;
     });
+    t.is(result, 8);
   `
 )
 
