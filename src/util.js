@@ -1,12 +1,12 @@
 import { _, it } from 'param.macro'
 
-const nonHoistTypes = [
+const nonHoistTypes = new Set([
   'Identifier',
   'ArrayExpression',
   'ObjectExpression',
   'FunctionExpression',
   'ArrowFunctionExpression'
-]
+])
 
 export class PartialError extends Error {
   constructor (message) {
@@ -154,7 +154,7 @@ export function shouldHoist (path) {
 
   return (
     !path.isLiteral() &&
-    nonHoistTypes.every(it !== path.node.type) &&
+    !nonHoistTypes.has(path.node.type) &&
     !isTransformed() &&
     !hasMacroArgs()
   )
