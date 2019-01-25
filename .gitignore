@@ -8,5 +8,6 @@ package-lock.json
 .vscode
 
 /dist
+/macro
 docs/.cache
 node_modules

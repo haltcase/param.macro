@@ -5,6 +5,7 @@ import { transform as transform6 } from 'babel-core'
 import { runInNewContext } from 'vm'
 import macros from 'babel-plugin-macros'
 import dedent from 'dedent'
+import { copy, remove } from 'fs-extra'
 
 const blankLines = /(^[ \t]*\n)/gm
 
@@ -31,11 +32,53 @@ const evalPlugin = ({ types: t }) => ({
   }
 })
 
+const rewrittenImportSource = './macro'
+
+const rewriteImportPlugin = () => {
+  const isParamMacroString = path =>
+    path.isStringLiteral({ value: 'param.macro' })
+
+  const isCalleeRequire = path =>
+    path.get('callee').isIdentifier({ name: 'require' })
+
+  const transformImport = path => {
+    const source = path.get('source')
+    if (isParamMacroString(source)) {
+      source.node.value = rewrittenImportSource
+    }
+  }
+
+  const transformCallExpression = path => {
+    const arg = path.get('arguments.0')
+    if (!!arg && isCalleeRequire(path) && isParamMacroString(arg)) {
+      arg.node.value = rewrittenImportSource
+    }
+  }
+
+  return {
+    visitor: {
+      // using `Program` visitor so we can transform before other plugins
+      Program (path) {
+        const body = path.get('body').forEach(p => {
+          if (p.isImportDeclaration()) {
+            transformImport(p)
+          } else if (p.isVariableDeclaration()) {
+            const init = p.get('declarations.0.init')
+            if (init.isCallExpression()) {
+              transformCallExpression(init)
+            }
+          }
+        })
+      }
+    }
+  }
+}
+
 const babel6 = (t, input, expected = ``) => {
   const normalizedInput = dedent(input)
   const output = transform6(normalizedInput, {
     babelrc: false,
-    plugins: [macros, evalPlugin],
+    plugins: [rewriteImportPlugin, macros, evalPlugin],
     filename: __filename,
     comments: false
   }).code.trim()
@@ -50,7 +93,7 @@ const babel7 = async (t, input, expected = ``) => {
 
   const output = transform7(normalizedInput, {
     babelrc: false,
-    plugins: [...syntaxPlugins, macros, evalPlugin],
+    plugins: [...syntaxPlugins, rewriteImportPlugin, macros, evalPlugin],
     filename: __filename
   }).code.trim()
 
@@ -62,6 +105,14 @@ const babel7 = async (t, input, expected = ``) => {
 }
 
 babel7.title = name => `(babel 7) ${name}`
+
+test.before(async () => {
+  // copy `dist` to `macro` directory, which is what the plugin
+  // above rewrites any `param.macro` imports to, so `babel-plugin-macros`
+  // is aware that this is a macro when it looks at the import source
+  await remove(rewrittenImportSource)
+  await copy('./dist', rewrittenImportSource)
+})
 
 test(
   'it: unused',

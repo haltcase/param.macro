@@ -30,7 +30,6 @@
     "plugin.js"
   ],
   "scripts": {
-    "prebuild": "npm-self-link",
     "build": "babel src -d dist",
     "pretest": "npm run build",
     "test": "ava",
@@ -48,6 +47,7 @@
     "ava": "^1.1.0",
     "babel-core": "^6.26.3",
     "dedent": "^0.7.0",
-    "npm-self-link": "^1.1.7"
+    "fs-extra": "^7.0.1",
+    "param.macro": "^3.0.0"
   }
 }
