@@ -40,5 +40,11 @@ module.exports = (env, argv) => ({
         loader: 'markdown-loader'
       }]
     }]
+  },
+  optimization: {
+    // TODO: minifying currently breaks the playground with:
+    // "Assertion failure - unknown rootMode value"
+    // ^ that's a babel error message - doesn't happen when not minified
+    minimize: false
   }
 })

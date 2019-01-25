@@ -1,7 +1,8 @@
 import { _, it } from 'param.macro'
 
-import { availablePlugins, transform } from '@babel/standalone'
-import { format } from '@citycide/prettier-babylon'
+import { availablePlugins, transform } from '@citycide/babel-standalone/dist/babel.min'
+import prettier from 'prettier/standalone'
+import babylon from 'prettier/parser-babylon'
 import highlight from 'highlight.js/lib/highlight'
 import javascript from 'highlight.js/lib/languages/javascript'
 import debounce from 'lodash.debounce'
@@ -356,7 +357,7 @@ const tryEval = debounce(input => {
   try {
     runnable = transform(input, {
       presets: [
-        ['stage-0', { decoratorsLegacy: true }]
+        'all'
       ]
     }).code
   } catch (e) {
@@ -411,7 +412,7 @@ const persist = debounce(state => {
 
 const syntaxPlugins = Object.keys(availablePlugins)
   .filter(it.startsWith('syntax') && it !== 'syntax-flow')
-  .map(it === 'syntax-decorators' ? [it, { legacy: true }] : it)
+  .map(it === 'syntax-decorators' ? [it, { decoratorsBeforeExport: false }] : it)
   .map(it === 'syntax-pipeline-operator' ? [it, { proposal: 'minimal' }] : it)
 
 const compilerPlugins = [...syntaxPlugins, plugin]
@@ -421,7 +422,9 @@ const compileSource = transform(_, {
   plugins: compilerPlugins
 }).code
 
-const formatCompiled = format(_, {
+const formatCompiled = prettier.format(_, {
+  parser: 'babylon',
+  plugins: [babylon],
   printWidth: 50,
   useTabs: false,
   tabWidth: 2,
