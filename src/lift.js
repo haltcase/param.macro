@@ -14,6 +14,9 @@ export default function transformLift (t, refs) {
       throw new PartialError('`lift` accepts a single expression as its only argument')
     }
 
+    // `lift` exists simply to stop upward traversal of placeholders
+    // which at this point have already been transformed, so we just
+    // remove the `lift` call and replace it with its argument
     parentPath.replaceWith(args[0])
   })
 }

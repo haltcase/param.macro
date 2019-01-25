@@ -27,6 +27,7 @@ export default function transformPlaceholders (t, refs) {
     const callee = findTargetCallee(referencePath)
     const wrapper = findWrapper(callee) || findWrapper(referencePath)
 
+    // generate a unique name and replace existing references with it
     const id = caller.scope.generateUidIdentifier('arg')
     const param = getParamNode(t, referencePath, id)
     referencePath.replaceWith(id)
@@ -34,6 +35,8 @@ export default function transformPlaceholders (t, refs) {
     callee |> markPlaceholder
 
     if (wrapper) {
+      // we've already wrapped this expression so simply add
+      // the above id to the existing wrapper's parameter list
       wrapper.node.params.push(param)
       return
     }
@@ -41,7 +44,12 @@ export default function transformPlaceholders (t, refs) {
     // track this as a location where parameters may need to be hoisted
     hoistTargets.push(caller)
 
+    // make sure tail paths are kept inside the wrapper
+    // (i.e. trailing member expressions like `foo(_).name`)
     const tail = findTopmostLink(caller)
+
+    // create an arrow function that wraps and returns the expression
+    // generating an arrow maintains lexical `this`
     const fn = t.arrowFunctionExpression(
       [param],
       t.blockStatement([
