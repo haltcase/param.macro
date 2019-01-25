@@ -2,9 +2,8 @@ import { _ } from 'param.macro'
 
 import {
   PartialError,
-  findTargetAssignment,
+  findTargetExpression,
   findTargetCallee,
-  findTargetCaller,
   findTopmostLink,
   findWrapper,
   hoistArguments,
@@ -16,25 +15,7 @@ export default function transformPlaceholders (t, refs) {
   const hoistTargets = []
 
   refs.forEach(referencePath => {
-    let wrapper = findWrapper(referencePath)
-
-    if (wrapper) {
-      const id = wrapper.scope.generateUidIdentifier('arg')
-      const param = getParamNode(t, referencePath, id)
-      referencePath.replaceWith(id)
-      referencePath |> findTargetCallee |> markPlaceholder
-      wrapper.node.params.push(param)
-      return
-    }
-
-    let isAssign = true
-    let caller = findTargetAssignment(referencePath)
-    if (caller) {
-      wrapper = findWrapper(referencePath, true)
-    } else {
-      isAssign = false
-      caller = findTargetCaller(referencePath)
-    }
+    const caller = findTargetExpression(referencePath)
 
     if (!caller) {
       throw new PartialError(
@@ -43,20 +24,22 @@ export default function transformPlaceholders (t, refs) {
       )
     }
 
+    const callee = findTargetCallee(referencePath)
+    const wrapper = findWrapper(callee) || findWrapper(referencePath)
+
     const id = caller.scope.generateUidIdentifier('arg')
     const param = getParamNode(t, referencePath, id)
     referencePath.replaceWith(id)
     referencePath |> markPlaceholder
+    callee |> markPlaceholder
 
     if (wrapper) {
       wrapper.node.params.push(param)
       return
     }
 
-    if (!isAssign) {
-      referencePath |> findTargetCallee |> markPlaceholder
-      hoistTargets.push(caller)
-    }
+    // track this as a location where parameters may need to be hoisted
+    hoistTargets.push(caller)
 
     const tail = findTopmostLink(caller)
     const fn = t.arrowFunctionExpression(
@@ -66,7 +49,9 @@ export default function transformPlaceholders (t, refs) {
       ])
     )
 
+    // replace the expression with the new wrapper that returns it
     tail.replaceWith(fn)
+    // mark the replacement so we can tell that it used to be a placeholder
     tail |> markPlaceholder
   })
 

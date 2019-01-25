@@ -601,3 +601,32 @@ test(
     t.is(1 + 1, 2);
   `
 )
+
+test(
+  '_: pipeline is considered a tail path when `_` is in the left node',
+  [babel7],
+  `
+    'test'
+    import { _, it } from 'param.macro'
+    const fn = someFn => someFn('world')
+    const inner = name => ({ name })
+    const otherFn = str => str.toUpperCase()
+    const result = fn(inner(_).name |> otherFn)
+    t.is(result, 'WORLD')
+  `,
+  `
+    const fn = someFn => someFn('world');
+
+    const inner = name => ({
+      name
+    });
+
+    const otherFn = str => str.toUpperCase();
+
+    const result = fn((_arg) => {
+      return inner(_arg).name |> otherFn;
+    });
+
+    t.is(result, 'WORLD');
+  `
+)

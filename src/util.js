@@ -21,10 +21,14 @@ export class PartialError extends Error {
   }
 }
 
-function isPipeline (path, child) {
+function isPipeline (path, child, side = 'right') {
+  if (side !== 'right' && side !== 'left') {
+    throw new RangeError('Expected side to be one of "left" or "right"')
+  }
+
   return (
     path.isBinaryExpression({ operator: '|>' }) &&
-    (!child || path.get('right') === child)
+    (!child || path.get(side) === child)
   )
 }
 
@@ -42,19 +46,31 @@ export function findParentUntil (path, pred, accumulate) {
   return accumulate ? link : null
 }
 
-export function findTargetAssignment (path, isImplicitParam = false) {
-  let calls = 0
+export function findTargetExpression (path, isImplicitParam = false) {
   return path |> findTopmostLink |> findParentUntil(_, (parent, link) => {
-    if (parent.isCallExpression() && ++calls > 0) return false
-
-    if (isImplicitParam && link.listKey === 'expressions') {
+    const isPipe = isPipeline(parent)
+    if (isPipe && parent.get('right') === link) {
       return link
+    } else if (isPipe && !isImplicitParam && parent.get('left') === link) {
+      return parent
+    } else if (parent.isVariableDeclarator()) {
+      return parent.get('init')
+    } else if (parent.isAssignmentPattern()) {
+      return parent.get('right')
     }
 
-    if (parent.isVariableDeclarator()) {
-      return parent.get('init')
-    } else if (parent.isAssignmentPattern() || isPipeline(parent, link)) {
-      return parent.get('right')
+    const key = link.listKey
+
+    if (isImplicitParam) {
+      if (key === 'expressions') {
+        return link
+      } else if (key === 'arguments') {
+        return link
+      }
+    } else {
+      if (key === 'arguments') {
+        return parent
+      }
     }
   })
 }
@@ -77,9 +93,17 @@ export function findTopmostLink (path) {
       parent.isUnaryExpression() &&
       parent.get('argument') === link
 
-    const isBinary = () =>
-      parent.isBinaryExpression() &&
-      parent.node.operator !== '|>'
+    const isBinary = () => {
+      if (parent.isBinaryExpression()) {
+        if (parent.node.operator === '|>') {
+          return parent.get('left') === link
+        }
+
+        return true
+      } else {
+        return false
+      }
+    }
 
     if (
       !parent.isMemberExpression() &&
@@ -90,11 +114,9 @@ export function findTopmostLink (path) {
   }, true)
 }
 
-export function findWrapper (path, noCallee) {
-  const root = noCallee ? path : findTargetCallee(path)
+export function findWrapper (path) {
   let calls = 0
-
-  return root |> findParentUntil(_, (parent, link) => {
+  return path |> findParentUntil(_, (parent, link) => {
     if (
       isPipeline(parent, link) ||
       (parent.isCallExpression() && ++calls > 1)
@@ -141,7 +163,7 @@ export function getParamNode (t, sourcePath, arg) {
 }
 
 export function markPlaceholder (path) {
-  path.setData('_.wasPlaceholder', true)
+  path && path.setData('_.wasPlaceholder', true)
 }
 
 export function shouldHoist (path) {

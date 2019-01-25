@@ -1,13 +1,13 @@
 import {
   PartialError,
-  findTargetAssignment,
+  findTargetExpression,
   findTargetCallee
 } from './util'
 
 export default function transformImplicitParams (t, refs) {
   refs.forEach(referencePath => {
     const parent =
-      findTargetAssignment(referencePath, true) ||
+      findTargetExpression(referencePath, true) ||
       findTargetCallee(referencePath)
 
     if (!parent) {
