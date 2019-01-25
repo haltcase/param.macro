@@ -12,7 +12,7 @@
   * [argument placeholders](#argument-placeholders): `add(1, _)`
   * [in assignments](#_-and-it-in-assignments): `const areSameThing = _ === _`
   * [other expressions](#other-expressions): `it.getPower().level > 9000`, ``const greet = `Hello, ${_}!` ``
-  * [`lift` modifier](#lift-modifier): `;[1, 2].reduce(lift(_ = _))`
+  * [`lift` modifier](#lift-modifier): `;[1, 2].reduce(lift(_ + _))`
 * [usage](#usage)
   * [Babel v7](#babelrcjs-babel-v7)
   * [Babel v6](#babelrc-babel-v6)
