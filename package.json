@@ -31,7 +31,8 @@
   ],
   "scripts": {
     "build": "babel src -d dist",
-    "pretest": "npm run build",
+    "setup": "trash macro && cpy 'dist/' 'macro/'",
+    "pretest": "npm run build && npm run setup",
     "test": "ava",
     "prepublishOnly": "npm test"
   },
@@ -46,8 +47,9 @@
     "@babel/preset-env": "^7.3.1",
     "ava": "^1.1.0",
     "babel-core": "^6.26.3",
+    "cpy-cli": "^2.0.0",
     "dedent": "^0.7.0",
-    "fs-extra": "^7.0.1",
-    "param.macro": "^3.0.0"
+    "param.macro": "^3.1.0",
+    "trash-cli": "^1.4.0"
   }
 }
