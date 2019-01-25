@@ -1,6 +1,6 @@
 'use strict'
 
-const transformImplicitParams = require('./dist/implicit-params').default
+const transformImplicitParams = require('./dist/implicit-parameters').default
 const transformPlaceholders = require('./dist/placeholders').default
 const transformLift = require('./dist/lift').default
 const { name } = require('./package.json')

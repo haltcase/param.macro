@@ -1,7 +1,7 @@
 import { createMacro } from 'babel-plugin-macros'
 
 import transformPlaceholders from './placeholders'
-import transformImplicitParams from './implicit-params'
+import transformImplicitParams from './implicit-parameters'
 import transformLift from './lift'
 
 export default createMacro(({ references, state, babel: { types: t } }) => {
