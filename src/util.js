@@ -8,17 +8,8 @@ const nonHoistTypes = new Set([
   'ArrowFunctionExpression'
 ])
 
-export class PartialError extends Error {
-  constructor (message) {
-    super(message)
-    this.name = 'PartialError'
-
-    if (typeof Error.captureStackTrace === 'function') {
-      Error.captureStackTrace(this, this.constructor)
-    } else if (!this.stack) {
-      this.stack = new Error(message).stack
-    }
-  }
+export const throwFrameError = (path, msg) => {
+  throw path.buildCodeFrameError(`\n\n${msg}\n\n`)
 }
 
 function isPipeline (path, child, side = 'right') {

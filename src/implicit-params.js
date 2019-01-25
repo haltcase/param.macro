@@ -1,7 +1,7 @@
 import {
-  PartialError,
   findTargetExpression,
-  findTargetCallee
+  findTargetCallee,
+  throwFrameError
 } from './util'
 
 export default function transformImplicitParams (t, refs) {
@@ -11,9 +11,10 @@ export default function transformImplicitParams (t, refs) {
       findTargetCallee(referencePath)
 
     if (!parent) {
-      throw new PartialError(
+      throwFrameError(
+        referencePath,
         'Implicit parameters must be used as function arguments or the\n' +
-        'right side of a variable declaration, ie. `const identity = it`)'
+        'right side of a variable declaration, ie. `const identity = it`'
       )
     }
 

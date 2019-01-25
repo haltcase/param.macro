@@ -123,6 +123,18 @@ const babel7 = async (t, input, expected = ``) => {
 
 babel7.title = name => `(babel 7) ${name}`
 
+const babel7Failure = async (t, input, expected) => {
+  t.throws(() => {
+    transform7(input, {
+      babelrc: false,
+      plugins: [...syntaxPlugins, rewriteImportPlugin, macros],
+      filename: __filename
+    })
+  }, expected)
+}
+
+babel7Failure.title = name => `(babel 7) ${name}`
+
 test.before(async () => {
   // copy `dist` to `macro` directory, which is what the plugin
   // above rewrites any `param.macro` imports to, so `babel-plugin-macros`
@@ -697,4 +709,44 @@ test(
     const result = bar.greet('world');
     t.is(result, 'Hello world');
   `
+)
+
+test(
+  'it: fails when used outside of a valid expression (pt. 1)',
+  [babel7Failure],
+  `
+    import it from 'param.macro'
+    it
+  `,
+  { message: /Implicit parameters must be used/ }
+)
+
+test(
+  'it: fails when used outside of a valid expression (pt. 2)',
+  [babel7Failure],
+  `
+    import it from 'param.macro'
+    it.property
+  `,
+  { message: /Implicit parameters must be used/ }
+)
+
+test(
+  '_: fails when used outside of a valid expression (pt. 1)',
+  [babel7Failure],
+  `
+    import { _ } from 'param.macro'
+    _
+  `,
+  { message: /Placeholders must be used/ }
+)
+
+test(
+  '_: fails when used outside of a valid expression (pt. 2)',
+  [babel7Failure],
+  `
+    import { _ } from 'param.macro'
+    _.property
+  `,
+  { message: /Placeholders must be used/ }
 )
