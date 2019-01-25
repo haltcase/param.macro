@@ -506,71 +506,14 @@ module.exports = debounce;
 "use strict";
 
 
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _wrapNativeSuper(Class) { var _cache = typeof Map === "function" ? new Map() : undefined; _wrapNativeSuper = function _wrapNativeSuper(Class) { if (Class === null || !_isNativeFunction(Class)) return Class; if (typeof Class !== "function") { throw new TypeError("Super expression must either be null or a function"); } if (typeof _cache !== "undefined") { if (_cache.has(Class)) return _cache.get(Class); _cache.set(Class, Wrapper); } function Wrapper() { return _construct(Class, arguments, _getPrototypeOf(this).constructor); } Wrapper.prototype = Object.create(Class.prototype, { constructor: { value: Wrapper, enumerable: false, writable: true, configurable: true } }); return _setPrototypeOf(Wrapper, Class); }; return _wrapNativeSuper(Class); }
-
-function isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
-
-function _construct(Parent, args, Class) { if (isNativeReflectConstruct()) { _construct = Reflect.construct; } else { _construct = function _construct(Parent, args, Class) { var a = [null]; a.push.apply(a, args); var Constructor = Function.bind.apply(Parent, a); var instance = new Constructor(); if (Class) _setPrototypeOf(instance, Class.prototype); return instance; }; } return _construct.apply(null, arguments); }
-
-function _isNativeFunction(fn) { return Function.toString.call(fn).indexOf("[native code]") !== -1; }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
 exports.__esModule = true;
-exports.findParentUntil = findParentUntil;
-exports.findTargetExpression = findTargetExpression;
-exports.findTargetCallee = findTargetCallee;
-exports.findTargetCaller = findTargetCaller;
-exports.findTopmostLink = findTopmostLink;
-exports.findWrapper = findWrapper;
-exports.hoistArguments = hoistArguments;
-exports.getParamNode = getParamNode;
-exports.markPlaceholder = markPlaceholder;
-exports.shouldHoist = shouldHoist;
-exports.wasMacro = wasMacro;
-exports.PartialError = void 0;
+exports.getParamNode = exports.hoistArguments = exports.shouldHoist = exports.findWrapper = exports.findTopmostLink = exports.findTargetExpression = exports.findParentUntil = exports.findTargetCaller = exports.findTargetCallee = exports.wasMacro = exports.markPlaceholder = exports.throwFrameError = void 0;
+
+var _ref;
+
 var nonHoistTypes = new Set(['Identifier', 'ArrayExpression', 'ObjectExpression', 'FunctionExpression', 'ArrowFunctionExpression']);
 
-var PartialError =
-/*#__PURE__*/
-function (_Error) {
-  _inherits(PartialError, _Error);
-
-  function PartialError(message) {
-    var _this;
-
-    _classCallCheck(this, PartialError);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(PartialError).call(this, message));
-    _this.name = 'PartialError';
-
-    if (typeof Error.captureStackTrace === 'function') {
-      Error.captureStackTrace(_assertThisInitialized(_assertThisInitialized(_this)), _this.constructor);
-    } else if (!_this.stack) {
-      _this.stack = new Error(message).stack;
-    }
-
-    return _this;
-  }
-
-  return PartialError;
-}(_wrapNativeSuper(Error));
-
-exports.PartialError = PartialError;
-
-function isPipeline(path, child) {
+var isPipeline = function isPipeline(path, child) {
   var side = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'right';
 
   if (side !== 'right' && side !== 'left') {
@@ -580,9 +523,39 @@ function isPipeline(path, child) {
   return path.isBinaryExpression({
     operator: '|>'
   }) && (!child || path.get(side) === child);
-}
+};
 
-function findParentUntil(path, pred, accumulate) {
+var throwFrameError = function throwFrameError(path, msg) {
+  throw path.buildCodeFrameError("\n\n".concat(msg, "\n\n"));
+};
+
+exports.throwFrameError = throwFrameError;
+
+var markPlaceholder = function markPlaceholder(path) {
+  path && path.setData('_.wasPlaceholder', true);
+};
+
+exports.markPlaceholder = markPlaceholder;
+
+var wasMacro = function wasMacro(_it) {
+  return _it.getData('_.wasPlaceholder', false) || _it.getData('it.wasTransformed', false);
+};
+
+exports.wasMacro = wasMacro;
+
+var findTargetCallee = function findTargetCallee(_arg) {
+  return _arg.find(function (_it2) {
+    return _it2.listKey === 'arguments';
+  });
+};
+
+exports.findTargetCallee = findTargetCallee;
+var findTargetCaller = (_ref = function _ref(_arg2) {
+  return findTargetCallee(_arg2);
+}) === null || _ref === void 0 ? void 0 : _ref.parentPath;
+exports.findTargetCaller = findTargetCaller;
+
+var findParentUntil = function findParentUntil(path, pred, accumulate) {
   var link = path;
 
   while ((_link = link) === null || _link === void 0 ? void 0 : _link.parentPath) {
@@ -597,15 +570,17 @@ function findParentUntil(path, pred, accumulate) {
   }
 
   return accumulate ? link : null;
-}
+};
 
-function findTargetExpression(path) {
+exports.findParentUntil = findParentUntil;
+
+var findTargetExpression = function findTargetExpression(path) {
   var isImplicitParam = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
-  var _path, _ref;
+  var _path, _ref2;
 
-  return _ref = (_path = path, findTopmostLink(_path)), function (_arg) {
-    return findParentUntil(_arg, function (parent, link) {
+  return _ref2 = (_path = path, findTopmostLink(_path)), function (_arg3) {
+    return findParentUntil(_arg3, function (parent, link) {
       var isPipe = isPipeline(parent);
 
       if (isPipe && parent.get('right') === link) {
@@ -623,7 +598,7 @@ function findTargetExpression(path) {
       var key = link.listKey;
 
       if (isImplicitParam) {
-        if (key === 'expressions') {
+        if (key === 'expressions' && parent.parentPath.isTaggedTemplateExpression()) {
           return link;
         } else if (key === 'arguments') {
           return link;
@@ -634,26 +609,16 @@ function findTargetExpression(path) {
         }
       }
     });
-  }(_ref);
-}
+  }(_ref2);
+};
 
-function findTargetCallee(path) {
-  return path.find(function (_it) {
-    return _it.listKey === 'arguments';
-  });
-}
+exports.findTargetExpression = findTargetExpression;
 
-function findTargetCaller(path) {
-  var _findTargetCallee;
-
-  return (_findTargetCallee = findTargetCallee(path)) === null || _findTargetCallee === void 0 ? void 0 : _findTargetCallee.parentPath;
-}
-
-function findTopmostLink(path) {
+var findTopmostLink = function findTopmostLink(path) {
   var _path2;
 
-  return _path2 = path, function (_arg2) {
-    return findParentUntil(_arg2, function (parent, link) {
+  return _path2 = path, function (_arg4) {
+    return findParentUntil(_arg4, function (parent, link) {
       var isCalleeTail = function isCalleeTail() {
         return parent.isCallExpression() && parent.get('callee') === link;
       };
@@ -677,14 +642,16 @@ function findTopmostLink(path) {
       if (!parent.isMemberExpression() && !isBinary() && !isCalleeTail() && !isUnary()) return false;
     }, true);
   }(_path2);
-}
+};
 
-function findWrapper(path) {
+exports.findTopmostLink = findTopmostLink;
+
+var findWrapper = function findWrapper(path) {
   var _path3;
 
   var calls = 0;
-  return _path3 = path, function (_arg3) {
-    return findParentUntil(_arg3, function (parent, link) {
+  return _path3 = path, function (_arg5) {
+    return findParentUntil(_arg5, function (parent, link) {
       if (isPipeline(parent, link) || parent.isCallExpression() && ++calls > 1) return false;
 
       if (parent.isArrowFunctionExpression() && wasMacro(parent)) {
@@ -692,9 +659,29 @@ function findWrapper(path) {
       }
     });
   }(_path3);
-}
+};
 
-function hoistArguments(t, caller) {
+exports.findWrapper = findWrapper;
+
+var shouldHoist = function shouldHoist(path) {
+  var isTransformed = function isTransformed() {
+    var _path4, _ref3;
+
+    return _ref3 = (_path4 = path, findTargetCallee(_path4)), wasMacro(_ref3);
+  };
+
+  var hasMacroArgs = function hasMacroArgs() {
+    return path.isCallExpression() && path.get('arguments').some(function (_arg6) {
+      return wasMacro(_arg6);
+    });
+  };
+
+  return !path.isLiteral() && !nonHoistTypes.has(path.node.type) && !isTransformed() && !hasMacroArgs();
+};
+
+exports.shouldHoist = shouldHoist;
+
+var hoistArguments = function hoistArguments(t, caller) {
   var _args;
 
   var args, upper;
@@ -704,8 +691,8 @@ function hoistArguments(t, caller) {
     upper = caller.getStatementParent();
   } else if (caller.isCallExpression()) {
     args = caller.get('arguments');
-    upper = caller.findParent(function (_it2) {
-      return _it2.isArrowFunctionExpression();
+    upper = caller.findParent(function (_it3) {
+      return _it3.isArrowFunctionExpression();
     }).getStatementParent();
   }
 
@@ -717,39 +704,19 @@ function hoistArguments(t, caller) {
     upper.insertBefore(ref);
     arg.replaceWith(id);
   });
-}
+};
 
-function getParamNode(t, sourcePath, arg) {
+exports.hoistArguments = hoistArguments;
+
+var getParamNode = function getParamNode(t, sourcePath, arg) {
   if (sourcePath.parentPath.isSpreadElement()) {
     return t.restElement(arg);
   } else {
     return arg;
   }
-}
+};
 
-function markPlaceholder(path) {
-  path && path.setData('_.wasPlaceholder', true);
-}
-
-function shouldHoist(path) {
-  var isTransformed = function isTransformed() {
-    var _path4, _ref2;
-
-    return _ref2 = (_path4 = path, findTargetCallee(_path4)), wasMacro(_ref2);
-  };
-
-  var hasMacroArgs = function hasMacroArgs() {
-    return path.isCallExpression() && path.get('arguments').some(function (_arg4) {
-      return wasMacro(_arg4);
-    });
-  };
-
-  return !path.isLiteral() && !nonHoistTypes.has(path.node.type) && !isTransformed() && !hasMacroArgs();
-}
-
-function wasMacro(path) {
-  return path.getData('_.wasPlaceholder', false) || path.getData('it.wasTransformed', false);
-}
+exports.getParamNode = getParamNode;
 
 /***/ }),
 /* 3 */
@@ -38522,7 +38489,7 @@ module.exports = function (babel) {
 /* 13 */
 /***/ (function(module, exports) {
 
-module.exports = "<h1 id=\"parammacro--version-license-travis-ci-javascript-standard-style\">param.macro &middot; <a href=\"https://www.npmjs.com/package/param.macro\"><img src=\"https://img.shields.io/npm/v/param.macro.svg?style=flat-square&maxAge=3600\" alt=\"Version\"></a> <a href=\"https://www.npmjs.com/package/param.macro\"><img src=\"https://img.shields.io/npm/l/param.macro.svg?style=flat-square&maxAge=3600\" alt=\"License\"></a> <a href=\"https://travis-ci.org/citycide/param.macro\"><img src=\"https://img.shields.io/travis/citycide/param.macro.svg?style=flat-square&maxAge=3600\" alt=\"Travis CI\"></a> <a href=\"https://standardjs.com\"><img src=\"https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square&maxAge=3600\" alt=\"JavaScript Standard Style\"></a></h1>\n<blockquote>\n<p>Partial application syntax and lambda parameters for JavaScript, inspired by Scala&#39;s <code>_</code> &amp; Kotlin&#39;s <code>it</code>. Read more about this macro in the intro blog post <a href=\"https://medium.com/@citycide/partial-application-lambda-parameters-for-js-aa16f4d94df4\">&quot;Partial Application &amp; Lambda Parameter Syntax for JavaScript&quot;</a></p>\n</blockquote>\n<blockquote>\n<p><strong>try it live</strong> on the <strong><a href=\"https://citycide.github.io/param.macro\">online playground</a></strong></p>\n</blockquote>\n<ul>\n<li><a href=\"#overview\">overview</a></li>\n<li><a href=\"#installation\">installation</a><ul>\n<li><a href=\"#set-custom-tokens\">set custom tokens</a></li>\n</ul>\n</li>\n<li><a href=\"#examples\">examples &amp; features</a><ul>\n<li><a href=\"#lambda-parameters\">lambda parameters</a>: <code>utensilList.find(it.isFork())</code></li>\n<li><a href=\"#argument-placeholders\">argument placeholders</a>: <code>add(1, _)</code></li>\n<li><a href=\"#_-and-it-in-assignments\">in assignments</a>: <code>const areSameThing = _ === _</code></li>\n<li><a href=\"#other-expressions\">other expressions</a>: <code>it.getPower().level &gt; 9000</code>, <code>const greet = `Hello, ${_}!`</code></li>\n<li><a href=\"#lift-modifier\"><code>lift</code> modifier</a>: <code>;[1, 2].reduce(lift(_ = _))</code></li>\n</ul>\n</li>\n<li><a href=\"#usage\">usage</a><ul>\n<li><a href=\"#babelrcjs-babel-v7\">Babel v7</a></li>\n<li><a href=\"#babelrc-babel-v6\">Babel v6</a></li>\n<li><a href=\"#standalone-plugin\">standalone plugin</a></li>\n</ul>\n</li>\n<li><a href=\"#differences-between-_-and-it\">differences between <code>_</code> and <code>it</code></a></li>\n<li><a href=\"#caveats--limitations\">caveats &amp; limitations</a></li>\n<li><a href=\"#comparison-to-libraries\">comparison to libraries</a></li>\n<li><a href=\"#see-also\">see also</a></li>\n<li><a href=\"#development\">development</a></li>\n<li><a href=\"#contributing\">contributing</a></li>\n<li><a href=\"#license\">license</a></li>\n</ul>\n<hr>\n<h2 id=\"overview\">overview</h2>\n<p><em>param.macro</em> provides two main symbols &mdash; <code>it</code> and <code>_</code>.</p>\n<p><code>it</code> can be used in an expression passed to a function which implicitly creates\na lambda function in place accepting a single argument.</p>\n<p>The <code>_</code> symbol is inspired by Scala and is used as a placeholder to signal that\na function call is partially applied &mdash; the original code isn&#39;t actually called\nyet, but will return a new function receiving the arguments you signified as\nplaceholders. Think of the values that aren&#39;t placeholders as being &quot;bound&quot;, and\nyou&#39;ll provide the rest later.</p>\n<p>Check out the <a href=\"#examples\">examples</a> section and the <a href=\"https://medium.com/@citycide/partial-application-lambda-parameters-for-js-aa16f4d94df4\">official introduction post</a>\nif you&#39;d like to see how these can be useful.</p>\n<h2 id=\"installation\">installation</h2>\n<pre><code class=\"language-console\">npm i --save-dev param.macro</code></pre>\n<p>Make sure you also have <a href=\"https://babeljs.io\">Babel</a> and <a href=\"https://github.com/kentcdodds/babel-plugin-macros\">babel-plugin-macros</a>\ninstalled (the following use Babel v7, see <a href=\"#usage\"><em>usage</em></a> for more):</p>\n<pre><code class=\"language-console\">npm i --save-dev @babel/cli @babel/core babel-plugin-macros</code></pre>\n<p>... and configured with Babel:</p>\n<pre><code class=\"language-js\">module.exports = {\n  presets: [],\n  plugins: [&#39;babel-plugin-macros&#39;]\n}</code></pre>\n<blockquote>\n<p>for usage without <code>babel-plugin-macros</code>, see <a href=\"#standalone-plugin\"><em>standalone plugin</em></a></p>\n</blockquote>\n<p>Then just <code>import</code> and use:</p>\n<pre><code class=\"language-js\">import { _, it } from &#39;param.macro&#39;</code></pre>\n<p><code>it</code> is also the default export, so you could also do:</p>\n<pre><code class=\"language-js\">import it from &#39;param.macro&#39;</code></pre>\n<blockquote>\n<p>The benefits of this explicit import are that linters and type systems won&#39;t have\na fit over <code>_</code> and <code>it</code> not being defined. It&#39;s also self-documenting and more easily\nunderstandable. Anyone looking at your code will know that these symbols come from\n<code>param.macro</code>.</p>\n</blockquote>\n<h3 id=\"set-custom-tokens\">set custom tokens</h3>\n<p>You can set custom identifiers for these just by using an aliased import.</p>\n<pre><code class=\"language-js\">import { it as IT, _ as PLACEHOLDER } from &#39;param.macro&#39;</code></pre>\n<p>or for the default <code>it</code> export:</p>\n<pre><code class=\"language-js\">import IT from &#39;param.macro&#39;</code></pre>\n<h2 id=\"examples\">examples</h2>\n<h3 id=\"lambda-parameters\">lambda parameters</h3>\n<p>Scala, Kotlin, etc have what&#39;s called a <em>lambda parameter</em> &mdash; an easy shorthand\nfor passing unary (single-argument) functions to other functions (higher order).\nIt&#39;s useful in higher order functions like <code>Array#map()</code>:</p>\n<pre><code class=\"language-js\">import it from &#39;param.macro&#39;\n\nconst people = [\n  { name: &#39;Jeff&#39; },\n  { name: &#39;Karen&#39; },\n  { name: &#39;Genevieve&#39; }\n]\n\npeople.map(it.name)\n// -&gt; [&#39;Jeff&#39;, &#39;Karen&#39;, &#39;Genevieve&#39;]</code></pre>\n<h3 id=\"argument-placeholders\">argument placeholders</h3>\n<p>Transform this:</p>\n<pre><code class=\"language-js\">import { _ } from &#39;param.macro&#39;\n\nfunction sumOfThreeNumbers (x, y, z) {\n  return x + y + z\n}\n\nconst oneAndTwoPlusOther = sumOfThreeNumbers(1, 2, _)</code></pre>\n<p>... into this:</p>\n<pre><code class=\"language-js\">function sumOfThreeNumbers (x, y, z) {\n  return x + y + z\n}\n\nconst oneAndTwoPlusOther = _arg =&gt; {\n  return sumOfThreeNumbers(1, 2, _arg)\n}</code></pre>\n<h3 id=\"_-and-it-in-assignments\"><code>_</code> and <code>it</code> in assignments</h3>\n<p>Most expressions using <code>_</code> and <code>it</code> can also be used outside function calls and\nassigned to a variable. Here are some ultra simple cases to demonstrate this:</p>\n<pre><code class=\"language-js\">import { _, it } from &#39;param.macro&#39;\n\nconst identity = it\nconst isEqualToItself = it === it\n\nconst areSameThing = _ === _</code></pre>\n<p>... becomes:</p>\n<pre><code class=\"language-js\">const identity = _it =&gt; _it\nconst isEqualToItself = _it2 =&gt; _it2 === _it2\n\nconst areSameThing = (_arg, _arg2) =&gt; _arg === _arg2</code></pre>\n<p>We could implement a <code>hasOwn()</code> function to check if a property exists on an\nobject like this:</p>\n<pre><code class=\"language-js\">import { it, _ } from &#39;param.macro&#39;\n\nconst hasOwn = it.hasOwnProperty(_)\nconst object = { flammable: true }\n\nhasOwn(object, &#39;flammable&#39;)\n// -&gt; true</code></pre>\n<h3 id=\"other-expressions\">other expressions</h3>\n<p>You can also put these macros to use within binary expressions, template literals,\nand most other expressions.</p>\n<pre><code class=\"language-js\">import { it, _ } from &#39;param.macro&#39;\n\nconst log = console.log(_)\n\nlog([0, 1, 0, 1].filter(!!it))\n// -&gt; [1, 1]\n\nconst heroes = [\n  { name: &#39;bob&#39;, getPower () { return { level: 9001 } } },\n  { name: &#39;joe&#39;, getPower () { return { level: 4500 } } }\n]\n\nlog(heroes.find(it.getPower().level &gt; 9000))\n// -&gt; { name: &#39;bob&#39;, getPower: [Function] }\n\nconst greet = `Hello, ${_}!`\n\nlog(greet(&#39;world&#39;))\n// -&gt; Hello, world!</code></pre>\n<p>It&#39;s especially fun to use with the pipeline operator since it basically removes\nthe need to auto-curry an entire library&#39;s API (like <a href=\"http://ramdajs.com/\">Ramda</a>), which can be\npretty costly for performance.</p>\n<p>This is a scenario specifically tested against to ensure compatibility:</p>\n<pre><code class=\"language-js\">import { _, it } from &#39;param.macro&#39;\n\nconst add = _ + _\nconst tenPlusString =\n  it\n  |&gt; parseInt(_, 10)\n  |&gt; add(10, _)\n  |&gt; String\n\ntenPlusString(&#39;10&#39;) |&gt; console.log\n// -&gt; 20</code></pre>\n<h3 id=\"lift-modifier\"><code>lift</code> modifier</h3>\n<p>In addition to <code>_</code> and <code>it</code>, there is a third symbol exported by <code>param.macro</code>\ncalled <strong><code>lift</code></strong>. In most scenarios it is simply removed from the output but is\nvery useful in combination with <code>_</code> placeholders.</p>\n<p>Because <code>it</code> creates only <em>unary</em> functions in place and <code>_</code> always traverses\n<em>out</em> of its nearest parent function call, <code>lift</code> serves as an operator that\nfills out the middle ground: using placeholders to create inline functions of\nany arity.</p>\n<p>With <code>_</code> alone, the following example will not do what you probably want:</p>\n<pre><code class=\"language-js\">import { _ } from &#39;param.macro&#39;\n\nconst array = [1, 2, 3, 4, 5]\nconst sum = array.reduce(_ + _)</code></pre>\n<p>Because it produces this:</p>\n<pre><code class=\"language-js\">const array = [1, 2, 3, 4, 5]\nconst sum = (_arg, _arg2) =&gt; {\n  return array.reduce(_arg + _arg2)\n}</code></pre>\n<p>To actually pass in an implicit binary function with <code>_</code> you can use the <code>lift</code>\noperator:</p>\n<pre><code class=\"language-js\">import { _, lift } from &#39;param.macro&#39;\n\nconst array = [1, 2, 3, 4, 5]\nconst sum = array.reduce(lift(_ + _))\nconsole.log(sum)\n// -&gt; 15</code></pre>\n<p>It may be helpful to note that <code>_</code> is still following its own rules here: it\ntraversed upward out of its parent function call! It just so happens that call\nis removed afterward leaving your new function exactly where you want it.</p>\n<h2 id=\"usage\">usage</h2>\n<h3 id=\"babelrcjs-babel-v7\">.babelrc.js (Babel v7)</h3>\n<pre><code class=\"language-js\">module.exports = {\n  presets: [],\n  plugins: [&#39;babel-plugin-macros&#39;]\n}</code></pre>\n<h3 id=\"babelrc-babel-v6\">.babelrc (Babel v6)</h3>\n<pre><code class=\"language-json\">{\n  &quot;presets&quot;: [],\n  &quot;plugins&quot;: [&quot;babel-plugin-macros&quot;]\n}</code></pre>\n<h3 id=\"standalone-plugin\">standalone plugin</h3>\n<p>A standalone version is also provided for those not already using <code>babel-plugin-macros</code>:</p>\n<ul>\n<li><p>.babelrc.js (Babel v7)</p>\n<pre><code class=\"language-js\">module.exports = {\n  presets: [],\n  plugins: [&#39;module:param.macro/plugin&#39;]\n}</code></pre>\n</li>\n<li><p>.babelrc (Babel v6)</p>\n<pre><code class=\"language-json\">{\n  &quot;presets&quot;: [],\n  &quot;plugins&quot;: [&quot;param.macro/plugin&quot;]\n}</code></pre>\n</li>\n</ul>\n<h2 id=\"differences-between-_-and-it\">differences between <code>_</code> and <code>it</code></h2>\n<p>There are two main &amp; distinct constructs provided by <em>param.macro</em>:</p>\n<ul>\n<li><code>_</code> &rarr; partial application symbol</li>\n<li><code>it</code> &rarr; implicit parameter symbol</li>\n</ul>\n<p>There are a couple of major differences between the two:</p>\n<h3 id=\"scoping\">scoping</h3>\n<p><code>_</code> will always traverse upward out of the nearest function call, while <code>it</code> will be\ntransformed in place. It&#39;s easiest to see when we look at a simple example:</p>\n<pre><code class=\"language-js\">import { _, it } from &#39;param.macro&#39;\n\nconst array = [1, 2, 3]\narray.map(_)\narray.map(it)</code></pre>\n<p>While these look like they might be the same, they&#39;ll come out acting very different:</p>\n<pre><code class=\"language-js\">const array = [1, 2, 3]\n_arg =&gt; array.map(_arg)\narray.map(_it =&gt; _it)</code></pre>\n<p>An exception to these scoping differences is at the top-level, like the right-hand\nside of an assignment. <code>it</code> and <code>_</code> behave similarly here since there&#39;s no further\nupward to go, so they&#39;ll both happen to target the same place.</p>\n<p>For example the following two map implementations do the same thing:</p>\n<pre><code class=\"language-js\">import { _, it } from &#39;param.macro&#39;\n\nconst map1 = _.map(_)\nconst map2 = it.map(_)</code></pre>\n<p><em>However</em>, if nested deeper inside a function call the object placeholder <code>_</code> in\n<code>map1</code> above would traverse further upward than an <code>it</code> would, and create a separate\nfunction <em>first</em>, before the argument placeholder <code>_</code> inside the method call itself.\nThis creates an unary method call instead of the implicit binary function we probably\nwanted, <code>lift</code> or not.</p>\n<p>The <code>it</code> implementation in <code>map2</code> above <em>does</em> still create the implicit binary\nfunction, even if nested deeper. And following the normal placeholder rules, any <code>_</code>\ninside the method call will traverse up to the method call and stop to create a\nfunction there, as we wanted.</p>\n<h3 id=\"argument-reuse\">argument reuse</h3>\n<p><code>it</code> always refers to the same argument even when used multiple times in an\nargument list. <code>_</code> will always refer to the <em>next</em> argument.</p>\n<pre><code class=\"language-js\">import { _, it } from &#39;param.macro&#39;\n\nconsole.log(_ + _ + _)\nconsole.log(it + it + it)</code></pre>\n<p>... are compiled to:</p>\n<pre><code class=\"language-js\">(_arg, _arg2, _arg3) =&gt; console.log(_arg + _arg2 + _arg3)\nconsole.log(_it =&gt; _it + _it + _it)</code></pre>\n<h2 id=\"caveats--limitations\">caveats &amp; limitations</h2>\n<blockquote>\n<p><code>_</code> is a common variable name ( eg. for <a href=\"https://github.com/lodash/lodash\">lodash</a> )</p>\n</blockquote>\n<p>This is the most obvious potential pitfall when using this plugin. <code>_</code> is\ncommonly used as the identifier for things like lodash&#39;s collection of utilities.</p>\n<p>There are a few reasons this is totally fine.</p>\n<ol>\n<li><p>The plugin allows for <a href=\"#set-custom-tokens\">custom symbols</a></p>\n<p> If you do happen to need <code>_</code> or <code>it</code> as identifiers, you&#39;re able to change\n the imported symbols (using standard aliased imports) to anything you want.</p>\n</li>\n<li><p><code>_</code> is a common symbol for partial application</p>\n<p> The Scala language uses the underscore as a placeholder for partially applied\n functions, and tons of JavaScript libraries have also used it &mdash; so it&#39;s become\n recognizable.</p>\n</li>\n<li><p>Monolithic builds of packages like lodash are on the way out</p>\n<p> lodash v5 will be getting rid of the monolithic build in favor of explicitly\n imported or &#39;cherry-picked&#39; utilities. So it will become less common to see\n the entirety of lodash imported, especially with ES module tree-shaking on\n the horizon.</p>\n<p> On top of that, <a href=\"https://github.com/lodash/babel-plugin-lodash\">babel-plugin-lodash</a> still works effectively\n when you just import what you need like this:</p>\n<pre><code class=\"language-js\"> import { add } from &#39;lodash&#39;</code></pre>\n</li>\n<li><p>Partial application with <code>_</code> is damn cool</p>\n</li>\n</ol>\n<h2 id=\"comparison-to-libraries\">comparison to libraries</h2>\n<p>Lodash, Underscore, Ramda, and other libraries have provided partial application\nwith a helper function something like <code>_.partial(fn, _)</code> which wraps the provided\nfunction, and basically just takes advantage of the fact that <code>{} !== {}</code> to recognize\nthat the monolithic <code>_</code>, <code>_.partial.placeholder</code>, or Ramda&#39;s <code>R.__</code> is a specific\nobject deemed a placeholder.</p>\n<p>This Babel plugin gives you the same features at the syntax level. And on top of\nthat, it adds features no runtime library can manage (like arbitrary expressions)\nand comes with zero runtime overhead. The macros are compiled away and turn into\nregular functions that don&#39;t have to check their arguments to see if a placeholder\nwas provided.</p>\n<h2 id=\"see-also\">see also</h2>\n<ul>\n<li><a href=\"https://github.com/rbuckton/proposal-partial-application\">TC39 proposal</a> &ndash; official syntactic proposal to the TC39 JavaScript standard</li>\n<li><a href=\"https://github.com/citycide/babel-plugin-partial-application\">babel-plugin-partial-application</a> &ndash; precursor to this project, more features but less stable</li>\n<li><a href=\"https://github.com/lodash/lodash/wiki/FP-Guide\">lodash/fp</a> &ndash; functional adaptation of the great Lodash utility library</li>\n<li><a href=\"http://ramdajs.com/\">Ramda</a> &ndash; highly functional programming-oriented utility library</li>\n<li><a href=\"https://github.com/xtuc/babel-plugin-transform-scala-lambda\">babel-plugin-transform-scala-lambda</a> &ndash; a similar plugin for more limited Scala-like lambda syntax</li>\n</ul>\n<h2 id=\"development\">development</h2>\n<ol>\n<li>Clone the repo: <code>git clone https://github.com/citycide/param.macro.git</code></li>\n<li>Move into the new directory: <code>cd param.macro</code></li>\n<li>Install dependencies: <code>npm install</code></li>\n<li>Build the source: <code>npm run build</code></li>\n<li>Run tests: <code>npm test</code></li>\n</ol>\n<blockquote>\n<p>this project uses itself in its source &mdash; see the <a href=\"https://github.com/Andarist/npm-self-link\"><code>npm-self-link</code></a>\nreadme for more about &#39;bootstrapping&#39; and how it handles that build step for us</p>\n</blockquote>\n<h2 id=\"contributing\">contributing</h2>\n<p>Pull requests and any <a href=\"https://github.com/citycide/param.macro/issues\">issues</a>\nfound are always welcome.</p>\n<ol>\n<li>Fork the project, and preferably create a branch named something like <code>feat-make-better</code></li>\n<li>Follow the build steps <a href=\"#development\">above</a> but using your forked repo</li>\n<li>Modify the source files in the <code>src</code> directory as needed</li>\n<li>Make sure all tests continue to pass, and it never hurts to have more tests</li>\n<li>Push &amp; pull request! :tada:</li>\n</ol>\n<h2 id=\"license\">license</h2>\n<p>MIT © <a href=\"https://github.com/citycide\">Bo Lingen / citycide</a></p>\n";
+module.exports = "<h1 id=\"parammacro--version-license-travis-ci-javascript-standard-style\">param.macro &middot; <a href=\"https://www.npmjs.com/package/param.macro\"><img src=\"https://img.shields.io/npm/v/param.macro.svg?style=flat-square&maxAge=3600\" alt=\"Version\"></a> <a href=\"https://www.npmjs.com/package/param.macro\"><img src=\"https://img.shields.io/npm/l/param.macro.svg?style=flat-square&maxAge=3600\" alt=\"License\"></a> <a href=\"https://travis-ci.org/citycide/param.macro\"><img src=\"https://img.shields.io/travis/citycide/param.macro.svg?style=flat-square&maxAge=3600\" alt=\"Travis CI\"></a> <a href=\"https://standardjs.com\"><img src=\"https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square&maxAge=3600\" alt=\"JavaScript Standard Style\"></a></h1>\n<blockquote>\n<p>Partial application syntax and lambda parameters for JavaScript, inspired by Scala&#39;s <code>_</code> &amp; Kotlin&#39;s <code>it</code>.\nRead more about this macro in the intro blog post <a href=\"https://medium.com/@citycide/partial-application-lambda-parameters-for-js-aa16f4d94df4\"><em>&quot;Partial Application &amp; Lambda Parameter Syntax for JavaScript&quot;</em></a>.</p>\n</blockquote>\n<blockquote>\n<p><strong>try it live</strong> on the <strong><a href=\"https://citycide.github.io/param.macro\">online playground</a></strong></p>\n</blockquote>\n<ul>\n<li><a href=\"#overview\">overview</a></li>\n<li><a href=\"#installation\">installation</a><ul>\n<li><a href=\"#set-custom-tokens\">set custom tokens</a></li>\n</ul>\n</li>\n<li><a href=\"#examples\">examples &amp; features</a><ul>\n<li><a href=\"#lambda-parameters\">lambda parameters</a>: <code>utensilList.find(it.isFork())</code></li>\n<li><a href=\"#argument-placeholders\">argument placeholders</a>: <code>add(1, _)</code></li>\n<li><a href=\"#_-and-it-in-assignments\">in assignments</a>: <code>const areSameThing = _ === _</code></li>\n<li><a href=\"#other-expressions\">other expressions</a>: <code>it.getPower().level &gt; 9000</code>, <code>const greet = `Hello, ${_}!`</code></li>\n<li><a href=\"#lift-modifier\"><code>lift</code> modifier</a>: <code>;[1, 2].reduce(lift(_ + _))</code></li>\n</ul>\n</li>\n<li><a href=\"#usage\">usage</a><ul>\n<li><a href=\"#babelrcjs-babel-v7\">Babel v7</a></li>\n<li><a href=\"#babelrc-babel-v6\">Babel v6</a></li>\n<li><a href=\"#standalone-plugin\">standalone plugin</a></li>\n</ul>\n</li>\n<li><a href=\"#differences-between-_-and-it\">differences between <code>_</code> and <code>it</code></a></li>\n<li><a href=\"#caveats--limitations\">caveats &amp; limitations</a></li>\n<li><a href=\"#comparison-to-libraries\">comparison to libraries</a></li>\n<li><a href=\"#see-also\">see also</a></li>\n<li><a href=\"#development\">development</a></li>\n<li><a href=\"#contributing\">contributing</a></li>\n<li><a href=\"#license\">license</a></li>\n</ul>\n<hr>\n<h2 id=\"overview\">overview</h2>\n<p><em>param.macro</em> provides two main symbols &mdash; <code>it</code> and <code>_</code>.</p>\n<p><code>it</code> can be used in an expression passed to a function which implicitly creates\na lambda function in place accepting a single argument.</p>\n<p>The <code>_</code> symbol is inspired by Scala and is used as a placeholder to signal that\na function call is partially applied &mdash; the original code isn&#39;t actually called\nyet, but will return a new function receiving the arguments you signified as\nplaceholders. Think of the values that aren&#39;t placeholders as being &quot;bound&quot;, and\nyou&#39;ll provide the rest later.</p>\n<p>Check out the <a href=\"#examples\">examples</a> section and the <a href=\"https://medium.com/@citycide/partial-application-lambda-parameters-for-js-aa16f4d94df4\">official introduction post</a>\nif you&#39;d like to see how these can be useful.</p>\n<h2 id=\"installation\">installation</h2>\n<pre><code class=\"language-console\">npm i --save-dev param.macro</code></pre>\n<p>Make sure you also have <a href=\"https://babeljs.io\">Babel</a> and <a href=\"https://github.com/kentcdodds/babel-plugin-macros\">babel-plugin-macros</a>\ninstalled (the following use Babel v7, see <a href=\"#usage\"><em>usage</em></a> for more):</p>\n<pre><code class=\"language-console\">npm i --save-dev @babel/cli @babel/core babel-plugin-macros</code></pre>\n<p>... and configured with Babel:</p>\n<pre><code class=\"language-js\">module.exports = {\n  presets: [],\n  plugins: [&#39;babel-plugin-macros&#39;]\n}</code></pre>\n<blockquote>\n<p>for usage without <code>babel-plugin-macros</code>, see <a href=\"#standalone-plugin\"><em>standalone plugin</em></a></p>\n</blockquote>\n<p>Then just <code>import</code> and use:</p>\n<pre><code class=\"language-js\">import { _, it } from &#39;param.macro&#39;</code></pre>\n<p><code>it</code> is also the default export, so you could also do:</p>\n<pre><code class=\"language-js\">import it from &#39;param.macro&#39;</code></pre>\n<blockquote>\n<p>The benefits of this explicit import are that linters and type systems won&#39;t have\na fit over <code>_</code> and <code>it</code> not being defined. It&#39;s also self-documenting and more easily\nunderstandable. Anyone looking at your code will know that these symbols come from\n<code>param.macro</code>.</p>\n</blockquote>\n<h3 id=\"set-custom-tokens\">set custom tokens</h3>\n<p>You can set custom identifiers for these just by using an aliased import.</p>\n<pre><code class=\"language-js\">import { it as IT, _ as PLACEHOLDER } from &#39;param.macro&#39;</code></pre>\n<p>or for the default <code>it</code> export:</p>\n<pre><code class=\"language-js\">import IT from &#39;param.macro&#39;</code></pre>\n<h2 id=\"examples\">examples</h2>\n<h3 id=\"lambda-parameters\">lambda parameters</h3>\n<p>Scala, Kotlin, etc have what&#39;s called a <em>lambda parameter</em> &mdash; an easy shorthand\nfor passing unary (single-argument) functions to other functions (higher order).\nIt&#39;s useful in higher order functions like <code>Array#map()</code>:</p>\n<pre><code class=\"language-js\">import it from &#39;param.macro&#39;\n\nconst people = [\n  { name: &#39;Jeff&#39; },\n  { name: &#39;Karen&#39; },\n  { name: &#39;Genevieve&#39; }\n]\n\npeople.map(it.name)\n// -&gt; [&#39;Jeff&#39;, &#39;Karen&#39;, &#39;Genevieve&#39;]</code></pre>\n<h3 id=\"argument-placeholders\">argument placeholders</h3>\n<p>Transform this:</p>\n<pre><code class=\"language-js\">import { _ } from &#39;param.macro&#39;\n\nfunction sumOfThreeNumbers (x, y, z) {\n  return x + y + z\n}\n\nconst oneAndTwoPlusOther = sumOfThreeNumbers(1, 2, _)</code></pre>\n<p>... into this:</p>\n<pre><code class=\"language-js\">function sumOfThreeNumbers (x, y, z) {\n  return x + y + z\n}\n\nconst oneAndTwoPlusOther = _arg =&gt; {\n  return sumOfThreeNumbers(1, 2, _arg)\n}</code></pre>\n<h3 id=\"_-and-it-in-assignments\"><code>_</code> and <code>it</code> in assignments</h3>\n<p>Most expressions using <code>_</code> and <code>it</code> can also be used outside function calls and\nassigned to a variable. Here are some ultra simple cases to demonstrate this:</p>\n<pre><code class=\"language-js\">import { _, it } from &#39;param.macro&#39;\n\nconst identity = it\nconst isEqualToItself = it === it\n\nconst areSameThing = _ === _</code></pre>\n<p>... becomes:</p>\n<pre><code class=\"language-js\">const identity = _it =&gt; _it\nconst isEqualToItself = _it2 =&gt; _it2 === _it2\n\nconst areSameThing = (_arg, _arg2) =&gt; _arg === _arg2</code></pre>\n<p>We could implement a <code>hasOwn()</code> function to check if a property exists on an\nobject like this:</p>\n<pre><code class=\"language-js\">import { it, _ } from &#39;param.macro&#39;\n\nconst hasOwn = it.hasOwnProperty(_)\nconst object = { flammable: true }\n\nhasOwn(object, &#39;flammable&#39;)\n// -&gt; true</code></pre>\n<h3 id=\"other-expressions\">other expressions</h3>\n<p>You can also put these macros to use within binary expressions, template literals,\nand most other expressions.</p>\n<pre><code class=\"language-js\">import { it, _ } from &#39;param.macro&#39;\n\nconst log = console.log(_)\n\nlog([0, 1, 0, 1].filter(!!it))\n// -&gt; [1, 1]\n\nconst heroes = [\n  { name: &#39;bob&#39;, getPower () { return { level: 9001 } } },\n  { name: &#39;joe&#39;, getPower () { return { level: 4500 } } }\n]\n\nlog(heroes.find(it.getPower().level &gt; 9000))\n// -&gt; { name: &#39;bob&#39;, getPower: [Function] }\n\nconst greet = `Hello, ${_}!`\n\nlog(greet(&#39;world&#39;))\n// -&gt; Hello, world!</code></pre>\n<p>It&#39;s especially fun to use with the pipeline operator since it basically removes\nthe need to auto-curry an entire library&#39;s API (like <a href=\"http://ramdajs.com/\">Ramda</a>), which can be\npretty costly for performance.</p>\n<p>This is a scenario specifically tested against to ensure compatibility:</p>\n<pre><code class=\"language-js\">import { _, it } from &#39;param.macro&#39;\n\nconst add = _ + _\nconst tenPlusString =\n  it\n  |&gt; parseInt(_, 10)\n  |&gt; add(10, _)\n  |&gt; String\n\ntenPlusString(&#39;10&#39;) |&gt; console.log\n// -&gt; 20</code></pre>\n<h3 id=\"lift-modifier\"><code>lift</code> modifier</h3>\n<p>In addition to <code>_</code> and <code>it</code>, there is a third symbol exported by <code>param.macro</code>\ncalled <strong><code>lift</code></strong>. In most scenarios it is simply removed from the output but is\nvery useful in combination with <code>_</code> placeholders.</p>\n<p>Because <code>it</code> creates only <em>unary</em> functions in place and <code>_</code> always traverses\n<em>out</em> of its nearest parent function call, <code>lift</code> serves as an operator that\nfills out the middle ground: using placeholders to create inline functions of\nany arity.</p>\n<p>With <code>_</code> alone, the following example will not do what you probably want:</p>\n<pre><code class=\"language-js\">import { _ } from &#39;param.macro&#39;\n\nconst array = [1, 2, 3, 4, 5]\nconst sum = array.reduce(_ + _)</code></pre>\n<p>Because it produces this:</p>\n<pre><code class=\"language-js\">const array = [1, 2, 3, 4, 5]\nconst sum = (_arg, _arg2) =&gt; {\n  return array.reduce(_arg + _arg2)\n}</code></pre>\n<p>To actually pass in an implicit binary function with <code>_</code> you can use the <code>lift</code>\noperator:</p>\n<pre><code class=\"language-js\">import { _, lift } from &#39;param.macro&#39;\n\nconst array = [1, 2, 3, 4, 5]\nconst sum = array.reduce(lift(_ + _))\nconsole.log(sum)\n// -&gt; 15</code></pre>\n<p>It may be helpful to note that <code>_</code> is still following its own rules here: it\ntraversed upward out of its parent function call! It just so happens that call\nis removed afterward leaving your new function exactly where you want it.</p>\n<h2 id=\"usage\">usage</h2>\n<h3 id=\"babelrcjs-babel-v7\">.babelrc.js (Babel v7)</h3>\n<pre><code class=\"language-js\">module.exports = {\n  presets: [],\n  plugins: [&#39;babel-plugin-macros&#39;]\n}</code></pre>\n<h3 id=\"babelrc-babel-v6\">.babelrc (Babel v6)</h3>\n<pre><code class=\"language-json\">{\n  &quot;presets&quot;: [],\n  &quot;plugins&quot;: [&quot;babel-plugin-macros&quot;]\n}</code></pre>\n<h3 id=\"standalone-plugin\">standalone plugin</h3>\n<p>A standalone version is also provided for those not already using <code>babel-plugin-macros</code>:</p>\n<ul>\n<li><p>.babelrc.js (Babel v7)</p>\n<pre><code class=\"language-js\">module.exports = {\n  presets: [],\n  plugins: [&#39;module:param.macro/plugin&#39;]\n}</code></pre>\n</li>\n<li><p>.babelrc (Babel v6)</p>\n<pre><code class=\"language-json\">{\n  &quot;presets&quot;: [],\n  &quot;plugins&quot;: [&quot;param.macro/plugin&quot;]\n}</code></pre>\n</li>\n</ul>\n<h2 id=\"differences-between-_-and-it\">differences between <code>_</code> and <code>it</code></h2>\n<p>There are two main &amp; distinct constructs provided by <em>param.macro</em>:</p>\n<ul>\n<li><code>_</code> &rarr; partial application symbol</li>\n<li><code>it</code> &rarr; implicit parameter symbol</li>\n</ul>\n<p>There are a couple of major differences between the two:</p>\n<h3 id=\"scoping\">scoping</h3>\n<p><code>_</code> will always traverse upward out of the nearest function call, while <code>it</code> will be\ntransformed in place. It&#39;s easiest to see when we look at a simple example:</p>\n<pre><code class=\"language-js\">import { _, it } from &#39;param.macro&#39;\n\nconst array = [1, 2, 3]\narray.map(_)\narray.map(it)</code></pre>\n<p>While these look like they might be the same, they&#39;ll come out acting very different:</p>\n<pre><code class=\"language-js\">const array = [1, 2, 3]\n_arg =&gt; array.map(_arg)\narray.map(_it =&gt; _it)</code></pre>\n<p>An exception to these scoping differences is at the top-level, like the right-hand\nside of an assignment. <code>it</code> and <code>_</code> behave similarly here since there&#39;s no further\nupward to go, so they&#39;ll both happen to target the same place.</p>\n<p>For example the following two map implementations do the same thing:</p>\n<pre><code class=\"language-js\">import { _, it } from &#39;param.macro&#39;\n\nconst map1 = _.map(_)\nconst map2 = it.map(_)</code></pre>\n<p><em>However</em>, if nested deeper inside a function call the object placeholder <code>_</code> in\n<code>map1</code> above would traverse further upward than an <code>it</code> would, and create a separate\nfunction <em>first</em>, before the argument placeholder <code>_</code> inside the method call itself.\nThis creates an unary method call instead of the implicit binary function we probably\nwanted, <code>lift</code> or not.</p>\n<p>The <code>it</code> implementation in <code>map2</code> above <em>does</em> still create the implicit binary\nfunction, even if nested deeper. And following the normal placeholder rules, any <code>_</code>\ninside the method call will traverse up to the method call and stop to create a\nfunction there, as we wanted.</p>\n<h3 id=\"argument-reuse\">argument reuse</h3>\n<p><code>it</code> always refers to the same argument even when used multiple times in an\nargument list. <code>_</code> will always refer to the <em>next</em> argument.</p>\n<pre><code class=\"language-js\">import { _, it } from &#39;param.macro&#39;\n\nconsole.log(_ + _ + _)\nconsole.log(it + it + it)</code></pre>\n<p>... are compiled to:</p>\n<pre><code class=\"language-js\">(_arg, _arg2, _arg3) =&gt; console.log(_arg + _arg2 + _arg3)\nconsole.log(_it =&gt; _it + _it + _it)</code></pre>\n<h2 id=\"caveats--limitations\">caveats &amp; limitations</h2>\n<blockquote>\n<p><code>_</code> is a common variable name ( eg. for <a href=\"https://github.com/lodash/lodash\">lodash</a> )</p>\n</blockquote>\n<p>This is the most obvious potential pitfall when using this plugin. <code>_</code> is\ncommonly used as the identifier for things like lodash&#39;s collection of utilities.</p>\n<p>There are a few reasons this is totally fine.</p>\n<ol>\n<li><p>The plugin allows for <a href=\"#set-custom-tokens\">custom symbols</a></p>\n<p> If you do happen to need <code>_</code> or <code>it</code> as identifiers, you&#39;re able to change\n the imported symbols (using standard aliased imports) to anything you want.</p>\n</li>\n<li><p><code>_</code> is a common symbol for partial application</p>\n<p> The Scala language uses the underscore as a placeholder for partially applied\n functions, and tons of JavaScript libraries have also used it &mdash; so it&#39;s become\n recognizable.</p>\n</li>\n<li><p>Monolithic builds of packages like lodash are on the way out</p>\n<p> lodash v5 will be getting rid of the monolithic build in favor of explicitly\n imported or &#39;cherry-picked&#39; utilities. So it will become less common to see\n the entirety of lodash imported, especially with ES module tree-shaking on\n the horizon.</p>\n<p> On top of that, <a href=\"https://github.com/lodash/babel-plugin-lodash\">babel-plugin-lodash</a> still works effectively\n when you just import what you need like this:</p>\n<pre><code class=\"language-js\"> import { add } from &#39;lodash&#39;</code></pre>\n</li>\n<li><p>Partial application with <code>_</code> is damn cool</p>\n</li>\n</ol>\n<h2 id=\"comparison-to-libraries\">comparison to libraries</h2>\n<p>Lodash, Underscore, Ramda, and other libraries have provided partial application\nwith a helper function something like <code>_.partial(fn, _)</code> which wraps the provided\nfunction, and basically just takes advantage of the fact that <code>{} !== {}</code> to recognize\nthat the monolithic <code>_</code>, <code>_.partial.placeholder</code>, or Ramda&#39;s <code>R.__</code> is a specific\nobject deemed a placeholder.</p>\n<p>This Babel plugin gives you the same features at the syntax level. And on top of\nthat, it adds features no runtime library can manage (like arbitrary expressions)\nand comes with zero runtime overhead. The macros are compiled away and turn into\nregular functions that don&#39;t have to check their arguments to see if a placeholder\nwas provided.</p>\n<h2 id=\"see-also\">see also</h2>\n<ul>\n<li><a href=\"https://github.com/rbuckton/proposal-partial-application\">TC39 proposal</a> &ndash; official syntactic proposal to the TC39 JavaScript standard</li>\n<li><a href=\"https://github.com/citycide/babel-plugin-partial-application\">babel-plugin-partial-application</a> &ndash; precursor to this project, more features but less stable</li>\n<li><a href=\"https://github.com/lodash/lodash/wiki/FP-Guide\">lodash/fp</a> &ndash; functional adaptation of the great Lodash utility library</li>\n<li><a href=\"http://ramdajs.com/\">Ramda</a> &ndash; highly functional programming-oriented utility library</li>\n<li><a href=\"https://github.com/xtuc/babel-plugin-transform-scala-lambda\">babel-plugin-transform-scala-lambda</a> &ndash; a similar plugin for more limited Scala-like lambda syntax</li>\n</ul>\n<h2 id=\"development\">development</h2>\n<ol>\n<li>Clone the repo: <code>git clone https://github.com/citycide/param.macro.git</code></li>\n<li>Move into the new directory: <code>cd param.macro</code></li>\n<li>Install dependencies: <code>npm install</code></li>\n<li>Build the source: <code>npm run build</code></li>\n<li>Run tests: <code>npm test</code></li>\n</ol>\n<blockquote>\n<p>this project uses itself in its source &mdash; see the <a href=\"https://github.com/Andarist/npm-self-link\"><code>npm-self-link</code></a>\nreadme for more about &#39;bootstrapping&#39; and how it handles that build step for us</p>\n</blockquote>\n<h2 id=\"contributing\">contributing</h2>\n<p>Pull requests and any <a href=\"https://github.com/citycide/param.macro/issues\">issues</a>\nfound are always welcome.</p>\n<ol>\n<li>Fork the project, and preferably create a branch named something like <code>feat-make-better</code></li>\n<li>Follow the build steps <a href=\"#development\">above</a> but using your forked repo</li>\n<li>Modify the source files in the <code>src</code> directory as needed</li>\n<li>Make sure all tests continue to pass, and it never hurts to have more tests</li>\n<li>Push &amp; pull request! :tada:</li>\n</ol>\n<h2 id=\"license\">license</h2>\n<p>MIT © <a href=\"https://github.com/citycide\">Bo Lingen / citycide</a></p>\n";
 
 /***/ }),
 /* 14 */
@@ -39034,17 +39001,16 @@ editor.getSession().on('change', lodash_debounce__WEBPACK_IMPORTED_MODULE_5___de
 /* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*! tether 1.4.3 */
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*! tether 1.4.4 */
 
 (function(root, factory) {
   if (true) {
-    !(__WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
 				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
-				(__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) :
-				__WEBPACK_AMD_DEFINE_FACTORY__),
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
   } else {}
-}(this, function(require, exports, module) {
+}(this, function() {
 
 'use strict';
 
@@ -40288,9 +40254,16 @@ var TetherClass = (function (_Evented) {
             this.options.bodyElement.appendChild(this.element);
           }
         } else {
+          var isFullscreenElement = function isFullscreenElement(e) {
+            var d = e.ownerDocument;
+            var fe = d.fullscreenElement || d.webkitFullscreenElement || d.mozFullScreenElement || d.msFullscreenElement;
+            return fe === e;
+          };
+
           var offsetParentIsBody = true;
+
           var currentNode = this.element.parentNode;
-          while (currentNode && currentNode.nodeType === 1 && currentNode.tagName !== 'BODY') {
+          while (currentNode && currentNode.nodeType === 1 && currentNode.tagName !== 'BODY' && !isFullscreenElement(currentNode)) {
             if (getComputedStyle(currentNode).position !== 'static') {
               offsetParentIsBody = false;
               break;
@@ -40857,16 +40830,16 @@ return Tether;
 
 
 exports.__esModule = true;
-exports.default = transformImplicitParams;
+exports.default = void 0;
 
 var _util = __webpack_require__(2);
 
-function transformImplicitParams(t, refs) {
+var _default = function _default(t, refs) {
   refs.forEach(function (referencePath) {
     var parent = (0, _util.findTargetExpression)(referencePath, true) || (0, _util.findTargetCallee)(referencePath);
 
     if (!parent) {
-      throw new _util.PartialError('Implicit parameters must be used as function arguments or the\n' + 'right side of a variable declaration, ie. `const identity = it`)');
+      (0, _util.throwFrameError)(referencePath, 'Implicit parameters must be used as function arguments or the\n' + 'right side of a variable declaration, ie. `const identity = it`');
     }
 
     if (parent.getData('it.wasTransformed')) {
@@ -40890,7 +40863,9 @@ function transformImplicitParams(t, refs) {
     parent.setData('it.wasTransformed', true);
     parent.setData('it.idName', id.name);
   });
-}
+};
+
+exports.default = _default;
 
 /***/ }),
 /* 17 */
@@ -40900,11 +40875,11 @@ function transformImplicitParams(t, refs) {
 
 
 exports.__esModule = true;
-exports.default = transformPlaceholders;
+exports.default = void 0;
 
 var _util = __webpack_require__(2);
 
-function transformPlaceholders(t, refs) {
+var _default = function _default(t, refs) {
   var hoistTargets = [];
   refs.forEach(function (referencePath) {
     var _referencePath, _callee, _tail;
@@ -40912,7 +40887,7 @@ function transformPlaceholders(t, refs) {
     var caller = (0, _util.findTargetExpression)(referencePath);
 
     if (!caller) {
-      throw new _util.PartialError('Placeholders must be used as function arguments or the\n' + 'right side of a variable declaration, ie. `const eq = _ === _`)');
+      (0, _util.throwFrameError)(referencePath, 'Placeholders must be used as function arguments or the\n' + 'right side of a variable declaration, ie. `const eq = _ === _`');
     }
 
     var callee = (0, _util.findTargetCallee)(referencePath);
@@ -40947,7 +40922,9 @@ function transformPlaceholders(t, refs) {
   hoistTargets.forEach(function (_arg) {
     return (0, _util.hoistArguments)(t, _arg);
   });
-}
+};
+
+exports.default = _default;
 
 /***/ }),
 /* 18 */
@@ -40957,22 +40934,22 @@ function transformPlaceholders(t, refs) {
 
 
 exports.__esModule = true;
-exports.default = transformLift;
+exports.default = void 0;
 
 var _util = __webpack_require__(2);
 
-function transformLift(t, refs) {
+var _default = function _default(t, refs) {
   refs.forEach(function (referencePath) {
     var parentPath = referencePath.parentPath;
 
     if (!parentPath.isCallExpression()) {
-      throw new _util.PartialError('`lift` can only be used as a call expression');
+      (0, _util.throwFrameError)(referencePath, '`lift` can only be used as a call expression');
     }
 
     var args = parentPath.get('arguments');
 
     if (args.length !== 1) {
-      throw new _util.PartialError('`lift` accepts a single expression as its only argument');
+      (0, _util.throwFrameError)(referencePath, '`lift` accepts a single expression as its only argument');
     } // `lift` exists simply to stop upward traversal of placeholders
     // which at this point have already been transformed, so we just
     // remove the `lift` call and replace it with its argument
@@ -40980,13 +40957,15 @@ function transformLift(t, refs) {
 
     parentPath.replaceWith(args[0]);
   });
-}
+};
+
+exports.default = _default;
 
 /***/ }),
 /* 19 */
 /***/ (function(module) {
 
-module.exports = {"name":"param.macro","version":"3.0.0","description":"Partial application syntax and lambda parameters for JavaScript, inspired by Scala's `_` & Kotlin's `it`","author":"Bo Lingen <lingenbw@gmail.com> (https://github.com/citycide)","license":"MIT","repository":"https://github.com/citycide/param.macro","homepage":"https://github.com/citycide/param.macro/tree/master/docs","bugs":"https://github.com/citycide/param.macro/issues","main":"./dist/index.js","engines":{"node":">=6"},"keywords":["babel-plugin-macros","babel-macros","macro","functional","partial","application","curry","scala","kotlin","template","placeholder","lambda"],"files":["dist","plugin.js"],"scripts":{"build":"babel src -d dist","pretest":"npm run build","test":"ava","prepublishOnly":"npm test"},"dependencies":{"babel-plugin-macros":"^2.4.5"},"devDependencies":{"@babel/cli":"^7.2.3","@babel/core":"^7.2.2","@babel/plugin-proposal-optional-chaining":"^7.2.0","@babel/plugin-proposal-pipeline-operator":"^7.3.0","@babel/preset-env":"^7.3.1","ava":"^1.1.0","babel-core":"^6.26.3","dedent":"^0.7.0","fs-extra":"^7.0.1","param.macro":"^3.0.0"}};
+module.exports = {"name":"param.macro","version":"3.2.0","description":"Partial application syntax and lambda parameters for JavaScript, inspired by Scala's `_` & Kotlin's `it`","author":"Bo Lingen <lingenbw@gmail.com> (https://github.com/citycide)","license":"MIT","repository":"https://github.com/citycide/param.macro","homepage":"https://github.com/citycide/param.macro/tree/master/docs","bugs":"https://github.com/citycide/param.macro/issues","main":"./dist/index.js","engines":{"node":">=6"},"keywords":["babel-plugin-macros","babel-macros","macro","functional","partial","application","curry","scala","kotlin","template","placeholder","lambda"],"files":["dist","plugin.js"],"scripts":{"build":"babel src -d dist","setup":"trash macro && cpy 'dist/' 'macro/'","pretest":"npm run build && npm run setup","test":"ava","prepublishOnly":"npm test"},"dependencies":{"babel-plugin-macros":"^2.4.5"},"devDependencies":{"@babel/cli":"^7.2.3","@babel/core":"^7.2.2","@babel/plugin-proposal-optional-chaining":"^7.2.0","@babel/plugin-proposal-pipeline-operator":"^7.3.0","@babel/preset-env":"^7.3.1","ava":"^1.1.0","babel-core":"^6.26.3","cpy-cli":"^2.0.0","dedent":"^0.7.0","param.macro":"^3.1.0","trash-cli":"^1.4.0"}};
 
 /***/ })
 /******/ ]);
