@@ -8,11 +8,7 @@ const nonHoistTypes = new Set([
   'ArrowFunctionExpression'
 ])
 
-export const throwFrameError = (path, msg) => {
-  throw path.buildCodeFrameError(`\n\n${msg}\n\n`)
-}
-
-function isPipeline (path, child, side = 'right') {
+const isPipeline = (path, child, side = 'right') => {
   if (side !== 'right' && side !== 'left') {
     throw new RangeError('Expected side to be one of "left" or "right"')
   }
@@ -23,7 +19,25 @@ function isPipeline (path, child, side = 'right') {
   )
 }
 
-export function findParentUntil (path, pred, accumulate) {
+export const throwFrameError = (path, msg) => {
+  throw path.buildCodeFrameError(`\n\n${msg}\n\n`)
+}
+
+export const markPlaceholder = path => {
+  path && path.setData('_.wasPlaceholder', true)
+}
+
+export const wasMacro =
+  it.getData('_.wasPlaceholder', false) ||
+  it.getData('it.wasTransformed', false)
+
+export const findTargetCallee =
+  _.find(it.listKey === 'arguments')
+
+export const findTargetCaller =
+  findTargetCallee(_)?.parentPath
+
+export const findParentUntil = (path, pred, accumulate) => {
   let link = path
   while (link?.parentPath) {
     const parent = link.parentPath
@@ -37,7 +51,7 @@ export function findParentUntil (path, pred, accumulate) {
   return accumulate ? link : null
 }
 
-export function findTargetExpression (path, isImplicitParam = false) {
+export const findTargetExpression = (path, isImplicitParam = false) => {
   return path |> findTopmostLink |> findParentUntil(_, (parent, link) => {
     const isPipe = isPipeline(parent)
     if (isPipe && parent.get('right') === link) {
@@ -68,15 +82,7 @@ export function findTargetExpression (path, isImplicitParam = false) {
   })
 }
 
-export function findTargetCallee (path) {
-  return path.find(it.listKey === 'arguments')
-}
-
-export function findTargetCaller (path) {
-  return findTargetCallee(path)?.parentPath
-}
-
-export function findTopmostLink (path) {
+export const findTopmostLink = path => {
   return path |> findParentUntil(_, (parent, link) => {
     const isCalleeTail = () =>
       parent.isCallExpression() &&
@@ -107,7 +113,7 @@ export function findTopmostLink (path) {
   }, true)
 }
 
-export function findWrapper (path) {
+export const findWrapper = path => {
   let calls = 0
   return path |> findParentUntil(_, (parent, link) => {
     if (
@@ -121,7 +127,23 @@ export function findWrapper (path) {
   })
 }
 
-export function hoistArguments (t, caller) {
+export const shouldHoist = path => {
+  const isTransformed = () =>
+    path |> findTargetCallee |> wasMacro
+
+  const hasMacroArgs = () =>
+    path.isCallExpression() &&
+    path.get('arguments').some(wasMacro(_))
+
+  return (
+    !path.isLiteral() &&
+    !nonHoistTypes.has(path.node.type) &&
+    !isTransformed() &&
+    !hasMacroArgs()
+  )
+}
+
+export const hoistArguments = (t, caller) => {
   let args, upper
   if (caller.isArrowFunctionExpression()) {
     args = caller.get('body.body.0.argument.arguments')
@@ -147,37 +169,10 @@ export function hoistArguments (t, caller) {
   })
 }
 
-export function getParamNode (t, sourcePath, arg) {
+export const getParamNode = (t, sourcePath, arg) => {
   if (sourcePath.parentPath.isSpreadElement()) {
     return t.restElement(arg)
   } else {
     return arg
   }
-}
-
-export function markPlaceholder (path) {
-  path && path.setData('_.wasPlaceholder', true)
-}
-
-export function shouldHoist (path) {
-  const isTransformed = () =>
-    path |> findTargetCallee |> wasMacro
-
-  const hasMacroArgs = () =>
-    path.isCallExpression() &&
-    path.get('arguments').some(wasMacro(_))
-
-  return (
-    !path.isLiteral() &&
-    !nonHoistTypes.has(path.node.type) &&
-    !isTransformed() &&
-    !hasMacroArgs()
-  )
-}
-
-export function wasMacro (path) {
-  return (
-    path.getData('_.wasPlaceholder', false) ||
-    path.getData('it.wasTransformed', false)
-  )
 }

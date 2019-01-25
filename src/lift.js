@@ -1,6 +1,6 @@
 import { throwFrameError } from './util'
 
-export default function transformLift (t, refs) {
+export default (t, refs) => {
   refs.forEach(referencePath => {
     const { parentPath } = referencePath
 

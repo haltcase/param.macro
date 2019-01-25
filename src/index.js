@@ -4,7 +4,7 @@ import transformPlaceholders from './placeholders'
 import transformImplicitParams from './implicit-params'
 import transformLift from './lift'
 
-function transform ({ references, state, babel: { types: t } }) {
+export default createMacro(({ references, state, babel: { types: t } }) => {
   // `it` needs to be transformed before `_` to allow them to work together
 
   if (references.it) transformImplicitParams(t, references.it)
@@ -16,6 +16,4 @@ function transform ({ references, state, babel: { types: t } }) {
   // after placeholders are transformed, all that happens is
   // that each `lift` call is replaced by its sole argument
   if (references.lift) transformLift(t, references.lift)
-}
-
-export default createMacro(transform)
+})

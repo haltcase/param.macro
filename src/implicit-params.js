@@ -4,7 +4,7 @@ import {
   throwFrameError
 } from './util'
 
-export default function transformImplicitParams (t, refs) {
+export default (t, refs) => {
   refs.forEach(referencePath => {
     const parent =
       findTargetExpression(referencePath, true) ||

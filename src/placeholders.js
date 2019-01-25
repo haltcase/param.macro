@@ -11,7 +11,7 @@ import {
   throwFrameError
 } from './util'
 
-export default function transformPlaceholders (t, refs) {
+export default (t, refs) => {
   const hoistTargets = []
 
   refs.forEach(referencePath => {
