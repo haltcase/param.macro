@@ -69,7 +69,10 @@ export const findTargetExpression = (path, isImplicitParam = false) => {
     const key = link.listKey
 
     if (isImplicitParam) {
-      if (key === 'expressions') {
+      if (
+        key === 'expressions' &&
+        parent.parentPath.isTaggedTemplateExpression()
+      ) {
         return link
       } else if (key === 'arguments') {
         return link

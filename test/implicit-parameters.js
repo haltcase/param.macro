@@ -160,6 +160,26 @@ test(
 )
 
 test(
+  'it: wraps template literals unlike tagged template expressions',
+  [macros.babel7, macros.babel6],
+  `
+    import it from 'param.macro'
+    const a = \`
+      font-size: 16px;
+      color: \${it.color};
+    \`
+  `,
+  `
+    const a = _it => {
+      return \`
+      font-size: 16px;
+      color: \${_it.color};
+    \`;
+    };
+  `
+)
+
+test(
   'it: fails when used outside of a valid expression (pt. 1)',
   [macros.babel7Failure],
   `
