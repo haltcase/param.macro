@@ -4,7 +4,7 @@ module.exports = (env, argv) => ({
   mode: 'development',
   entry: './src/index.js',
   output: {
-    path: resolve(__dirname),
+    path: resolve(__dirname, 'dist'),
     filename: 'bundle.js'
   },
   module: {

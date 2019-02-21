@@ -10,4 +10,5 @@ package-lock.json
 /dist
 /macro
 docs/.cache
+docs/dist/bundle.js
 node_modules
