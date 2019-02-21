@@ -8,7 +8,7 @@ notifications:
   email: false
 
 before_deploy:
-  - 'cd docs && npm run build'
+  - 'cd docs && npm install && npm run build'
 
 deploy:
   provider: pages
