@@ -16,6 +16,8 @@ jobs:
         skip-cleanup: true
         github-token: $GITHUB_TOKEN
         local-dir: docs/dist
+        on:
+          tags: true
 
 notifications:
   email: false
