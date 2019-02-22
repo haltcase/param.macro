@@ -10,12 +10,12 @@ jobs:
     - stage: deploy
       name: "Deploy Playground"
       node_js: node
-      before_deploy: cd docs && npm install && npm run build
+      before_deploy: cd playground && npm install && npm run build
       deploy:
         provider: pages
         skip-cleanup: true
         github-token: $GITHUB_TOKEN
-        local-dir: docs/dist
+        local-dir: playground/build
         on:
           tags: true
 
