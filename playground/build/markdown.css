@@ -100,13 +100,20 @@
   display: block;
 }
 
+.markdown a code {
+  font-family: 'Fira Code', 'Ubuntu Mono', 'Droid Sans Mono', 'Operator Mono', 'Liberation Mono', 'Source Code Pro', Menlo, Consolas, Courier, monospace;
+  white-space: pre;
+  margin: 0;
+  border-radius: 3px;
+  word-wrap: break-word;
+  border: 1px solid #cccccc;
+  padding: 0.15rem;
+}
+
 .markdown pre > code {
   font-family: 'Fira Code', 'Ubuntu Mono', 'Droid Sans Mono', 'Operator Mono', 'Liberation Mono', 'Source Code Pro', Menlo, Consolas, Courier, monospace;
   white-space: pre;
   margin: 0;
-}
-
-.markdown code {
   border-radius: 3px;
   word-wrap: break-word;
   border: 1px solid #cccccc;
