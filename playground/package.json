@@ -45,6 +45,7 @@
     "@babel/preset-env": "^7.3.1",
     "babel-loader": "8.0.4",
     "babel-plugin-macros": "^2.4.2",
+    "copy-webpack-plugin": "^5.0.3",
     "html-loader": "^0.5.5",
     "lz-string": "^1.4.4",
     "markdown-loader": "^5.0.0",

@@ -1,5 +1,7 @@
 const { resolve } = require('path')
 
+const CopyPlugin = require('copy-webpack-plugin')
+
 module.exports = (env, argv) => ({
   mode: 'development',
   entry: './src/index.js',
@@ -46,5 +48,10 @@ module.exports = (env, argv) => ({
     // "Assertion failure - unknown rootMode value"
     // ^ that's a babel error message - doesn't happen when not minified
     minimize: false
-  }
+  },
+  plugins: [
+    new CopyPlugin([
+      { from: 'src/*.{css,html}', to: '[name].[ext]' }
+    ])
+  ]
 })
