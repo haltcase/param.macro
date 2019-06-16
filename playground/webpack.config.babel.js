@@ -1,12 +1,14 @@
-const { resolve } = require('path')
+const { join, resolve } = require('path')
 
 const CopyPlugin = require('copy-webpack-plugin')
+
+const outputDirectory = resolve(__dirname, 'build')
 
 module.exports = (env, argv) => ({
   mode: 'development',
   entry: './src/index.js',
   output: {
-    path: resolve(__dirname, 'build'),
+    path: outputDirectory,
     filename: 'bundle.js'
   },
   module: {
@@ -51,7 +53,7 @@ module.exports = (env, argv) => ({
   },
   plugins: [
     new CopyPlugin([
-      { from: 'src/*.{css,html}', to: '[name].[ext]' }
+      { from: 'src/*.{css,html}', to: join(outputDirectory, '[name].[ext]') }
     ])
   ]
 })
