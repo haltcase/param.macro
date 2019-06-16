@@ -10,5 +10,5 @@ package-lock.json
 /dist
 /macro
 /playground/.cache
-/playground/build/bundle.js
+/playground/build
 node_modules
