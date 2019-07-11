@@ -99,3 +99,54 @@ test(
     t.is(result, 'Hello world');
   `
 )
+
+test(
+  '_, it, lift: assignment expressions below top-level (#20)',
+  [macros.babel7],
+  `
+    'test'
+    import { _, it } from 'param.macro'
+
+    const foo = [
+      { bar: true },
+      { bar: false },
+      { bar: false }
+    ]
+
+    foo.forEach(it.bar = true)
+    t.true(foo.every(v => v.bar === true))
+
+    const identity = it
+    const a = identity(_.bar = true)
+    const b = a({ bar: false })
+    t.true(b)
+  `,
+  `
+    const foo = [{
+      bar: true
+    }, {
+      bar: false
+    }, {
+      bar: false
+    }];
+
+    foo.forEach(_it => {
+      return _it.bar = true;
+    });
+
+    t.true(foo.every(v => v.bar === true));
+
+    const identity = _it2 => {
+      return _it2;
+    };
+
+    const a = (_arg) => {
+      return identity(_arg.bar = true);
+    };
+
+    const b = a({
+      bar: false
+    });
+    t.true(b);
+  `
+)
