@@ -63,7 +63,15 @@ export const findTargetExpression = (path, isImplicitParam = false) => {
     } else if (parent.isAssignmentPattern()) {
       return parent.get('right')
     } else if (parent.isAssignmentExpression()) {
-      return parent.get('right')
+      if (parent.parentPath.isExpressionStatement()) {
+        return parent.get('right')
+      }
+
+      if (isImplicitParam) {
+        return parent
+      }
+
+      return parent.parentPath
     }
 
     const key = link.listKey
