@@ -31,7 +31,7 @@
   ],
   "scripts": {
     "build": "babel src -d dist",
-    "setup": "trash macro && cpy 'dist/' 'macro/'",
+    "setup": "trash macro && cpy \"dist/\" \"macro/\"",
     "pretest": "npm run build && npm run setup",
     "test": "ava",
     "prepublishOnly": "npm test"
