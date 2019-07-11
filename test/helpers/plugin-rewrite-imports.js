@@ -2,7 +2,10 @@ import { join } from 'path'
 
 export const rewrittenImportSource = './macro'
 
-const macroSource = join(process.cwd(), rewrittenImportSource)
+const unixPath = path =>
+  path.replace(/\\/g, '/')
+
+const macroSource = unixPath(join(process.cwd(), rewrittenImportSource))
 
 const isParamMacroString = path =>
   path.isStringLiteral({ value: 'param.macro' })
