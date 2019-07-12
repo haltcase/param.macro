@@ -46,15 +46,15 @@ if you'd like to see how these can be useful.
 
 ## installation
 
-```console
-npm i --save-dev param.macro
+```sh
+yarn add --dev param.macro
 ```
 
 Make sure you also have [Babel][babel] and [babel-plugin-macros][babel-plugin-macros]
 installed (the following use Babel v7, see [_usage_](#usage) for more):
 
-```console
-npm i --save-dev @babel/cli @babel/core babel-plugin-macros
+```sh
+yarn add --dev @babel/cli @babel/core babel-plugin-macros
 ```
 
 ... and configured with Babel:
@@ -451,9 +451,9 @@ was provided.
 
 1. Clone the repo: `git clone https://github.com/citycide/param.macro.git`
 2. Move into the new directory: `cd param.macro`
-3. Install dependencies: `npm install`
-4. Build the source: `npm run build`
-5. Run tests: `npm test`
+3. Install dependencies: `yarn` or `npm install`
+4. Build the source: `yarn build` or `npm run build`
+5. Run tests: `yarn test` or `npm test`
 
 > this project uses itself in its source, so you can use `param.macro` while you
 develop `param.macro` ([_... yo dawg_](https://knowyourmeme.com/memes/xzibit-yo-dawg))
