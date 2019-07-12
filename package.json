@@ -45,11 +45,11 @@
     "@babel/plugin-proposal-optional-chaining": "^7.2.0",
     "@babel/plugin-proposal-pipeline-operator": "^7.5.0",
     "@babel/preset-env": "^7.5.4",
-    "ava": "^2.2.0",
+    "ava": "^1.4.1",
     "babel-core": "^6.26.3",
     "cpy-cli": "^2.0.0",
     "dedent": "^0.7.0",
     "param.macro": "^3.2.0",
-    "trash-cli": "^3.0.0"
+    "trash-cli": "^1.4.0"
   }
 }
