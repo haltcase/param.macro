@@ -1,9 +1,9 @@
-# param.macro &middot; [![Version](https://flat.badgen.net/npm/v/param.macro)](https://www.npmjs.com/package/param.macro) [![License](https://flat.badgen.net/npm/license/param.macro)](https://www.npmjs.com/package/param.macro) [![Travis CI](https://flat.badgen.net/travis/citycide/param.macro)](https://travis-ci.org/citycide/param.macro) [![JavaScript Standard Style](https://flat.badgen.net/badge/code%20style/standard/green)](https://standardjs.com)
+# param.macro &middot; [![Version](https://flat.badgen.net/npm/v/param.macro)](https://www.npmjs.com/package/param.macro) [![License](https://flat.badgen.net/npm/license/param.macro)](https://www.npmjs.com/package/param.macro) [![JavaScript Standard Style](https://flat.badgen.net/badge/code%20style/standard/green)](https://standardjs.com)
 
 > Partial application syntax and lambda parameters for JavaScript, inspired by Scala's `_` & Kotlin's `it`.
 Read more about this macro in the intro blog post [_"Partial Application & Lambda Parameter Syntax for JavaScript"_][blog].
 
-> **try it live** on the **[online playground](https://citycide.github.io/param.macro)**
+> **try it live** on the **[online playground](https://haltcase.github.io/param.macro)**
 
 * [overview](#overview)
 * [installation](#installation)
@@ -460,7 +460,7 @@ develop `param.macro` ([_... yo dawg_](https://knowyourmeme.com/memes/xzibit-yo-
 
 ## contributing
 
-Pull requests and any [issues](https://github.com/citycide/param.macro/issues)
+Pull requests and any [issues](https://github.com/haltcase/param.macro/issues)
 found are always welcome.
 
 1. Fork the project, and preferably create a branch named something like `feat-make-better`
@@ -471,7 +471,7 @@ found are always welcome.
 
 ## license
 
-MIT © [Bo Lingen / citycide](https://github.com/citycide)
+MIT © [Bo Lingen / haltcase](https://github.com/haltcase)
 
 [blog]: https://medium.com/@citycide/partial-application-lambda-parameters-for-js-aa16f4d94df4
 [babel]: https://babeljs.io
@@ -483,4 +483,4 @@ MIT © [Bo Lingen / citycide](https://github.com/citycide)
 [lodash-fp]: https://github.com/lodash/lodash/wiki/FP-Guide
 [ramda]: http://ramdajs.com/
 [scala-lambda]: https://github.com/xtuc/babel-plugin-transform-scala-lambda
-[bppa]: https://github.com/citycide/babel-plugin-partial-application
+[bppa]: https://github.com/haltcase/babel-plugin-partial-application
